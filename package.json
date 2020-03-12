@@ -1,0 +1,24 @@
+{
+  "name": "postman",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^8.2.0",
+    "json-2-csv": "^3.5.9",
+    "moment": "^2.24.0",
+    "node-cron": "^2.0.3",
+    "nodemailer": "^6.4.3"
+  },
+  "devDependencies": {
+    "newman": "^4.5.7",
+    "newman-reporter-csv": "^1.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
