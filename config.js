@@ -9,4 +9,6 @@ module.exports = {
     password: process.env.PASSWORD,
     client_id: process.env.CLIENT_ID,
     client_secret: process.env.CLIENT_SECRET,
+    sendgrid_user: process.env.SENDGRID_USER,
+    sendgrid_key: process.env.SENDGRID_KEY
 };

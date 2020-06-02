@@ -1,7 +1,12 @@
+const moment = require('moment')
+
+moment.locale('fr')
+
 const headers = [
     { id: 'id', title: 'ID' },
     { id: 'reference_product', title: 'Reference produit' },
-    { id: 'reference_supplier', title: 'Reference vendeur' },
+    { id: 'variant_id', title: 'ID variante' },
+    { id: 'reference_variant', title: 'Reference variante' },
     { id: 'ean', title: 'EAN13' },
     { id: 'created_at', title: 'Date création' },
     { id: 'updated_at', title: 'Date modification' },
@@ -18,19 +23,16 @@ const headers = [
 ]
 
 exports.detail = product => {
-    let products = []
-    console.log(product)
+    const products = []
     product.variants.data.forEach(variant => {
-        if (variant.offers.data.length > 0) {
-            console.log('VARIANT OFFER')
-        }
         const Product = {
             id: product.id,
-            reference: variant.reference_supplier ? variant.reference_supplier : variant.reference,
-            reference: variant.reference_supplier ? variant.reference_supplier : variant.reference,
+            reference_product: product.reference,
+            variant_id: variant.id,
+            reference_variant: variant.reference,
             ean: variant.ean13,
-            created_at: product.created_at,
-            updated_at: product.updated_at,
+            created_at: moment(product.created_at).format('L'),
+            updated_at: moment(product.updated_at).format('L'),
             name: product.translations.data[0].name,
             long_description: product.translations.data[0].description,
             short_description: product.translations.data[0].description_short,
@@ -43,9 +45,11 @@ exports.detail = product => {
             state: product.state
         }
         if (variant.attributes.data.length > 0) {
-            variant.attributes.data.forEach((attribute, index) => {
-                headers.push({ id: `attribute ${index + 1}`, title: attribute.attribute_type.data.translations.data[0].name})
-                Object.defineProperty(Product, `attribute ${index + 1}`, {
+            variant.attributes.data.forEach((attribute) => {
+                if (!headers.some(header => header.id === `attribute_${attribute.attribute_type.data.id}`)) {
+                    headers.push({ id: `attribute_${attribute.attribute_type.data.id}`, title: attribute.attribute_type.data.translations.data[0].name})
+                }
+                Object.defineProperty(Product, `attribute_${attribute.attribute_type.data.id}`, {
                     value: attribute.attribute_value.data.translations.data[0].name
                 });
             })

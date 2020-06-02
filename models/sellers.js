@@ -1,6 +1,7 @@
 exports.detail = data => {
     return {
         id: data.id,
+        state: data.is_active,
         name: data.name,
         type: data.seller_type,
         email: data.email,
@@ -16,6 +17,7 @@ exports.detail = data => {
 
 exports.headers = [
     { id: 'id', title: 'ID' },
+    { id: 'state', title: 'Statut' },
     { id: 'name', title: 'Nom' },
     { id: 'type', title: 'Type' },
     { id: 'email', title: 'Email' },

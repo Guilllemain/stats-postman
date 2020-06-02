@@ -12,12 +12,8 @@
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.3"
   },
-  "devDependencies": {
-    "newman": "^4.5.7",
-    "newman-reporter-csv": "^1.1.1"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC"

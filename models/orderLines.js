@@ -1,5 +1,5 @@
 exports.detail = data => {
-    let product_lines = []
+    const product_lines = []
     data.orderLines.data.forEach(line => {
         product_lines.push({
             id: data.id,
@@ -28,4 +28,4 @@ exports.headers = [
 
 exports.filename = 'order_lines.csv'
 
-exports.uri = '/v1/orders?include=orderLines'
+exports.uri = '/v1/orders?include=orderLines,seller'

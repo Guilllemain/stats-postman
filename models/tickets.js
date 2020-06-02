@@ -3,33 +3,44 @@ const moment = require('moment')
 moment.locale('fr')
 
 exports.detail = data => {
-    return {
-        id: data.id,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-        status: data.status,
-        seller: data.seller.data.name,
+    const lines = []
+    const tags = []
+    if (data.tags.data.length > 0) {
+        data.tags.data.forEach(tag => {
+            tags.push(tag.name)
+        })
+        tags.join(', ')
     }
-};
+    data.messages.data.forEach(message => {
+        lines.push({
+            id: data.id,
+            status: data.status,
+            created_at: moment(data.created_at).format('L'),
+            updated_at: moment(data.updated_at).format('L'),
+            order_number: data.order_seller ? data.order_seller.data.reference : '',
+            subject: message.subject,
+            message: message.body,
+            message_created_at: moment(message.created_at).format('L'),
+            seller: data.seller ? data.seller.data.name : '',
+            tags
+        })
+    })
+    return lines
+}
 
 exports.headers = [
     { id: 'id', title: 'ID' },
-    { id: 'reference', title: 'Reference' },
-    { id: 'date', title: 'Date' },
-    { id: 'time', title: 'Heure' },
-    { id: 'total', title: 'Total TTC' },
-    { id: 'total_products', title: 'Total produits TTC' },
-    { id: 'total_shipping', title: 'Total livraison TTC' },
-    { id: 'product_lines_count', title: 'Nombre lignes' },
-    { id: 'tracking_link', title: 'Lien livraison' },
-    { id: 'customer_name', title: 'Nom client' },
-    { id: 'customer_email', title: 'Email client' },
+    { id: 'status', title: 'Statut' },
+    { id: 'created_at', title: 'Date de creation' },
+    { id: 'updated_at', title: 'Date de modification' },
+    { id: 'order_number', title: 'Commande' },
+    { id: 'subject', title: 'Sujet' },
+    { id: 'message', title: 'Message' },
+    { id: 'message_created_at', title: 'Date du message' },
     { id: 'seller', title: 'Vendeur' },
-    { id: 'state', title: 'Etat' },
-    { id: 'shipping_name', title: 'Nom transport' },
-    { id: 'shipping_type', title: 'Type transport' }
+    { id: 'tags', title: 'Tags' }
 ]
 
-exports.filename = 'orders.csv'
+exports.filename = 'tickets.csv'
 
-exports.uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,customer'
+exports.uri = '/v1/tickets?include=messages,seller,order_seller,tags'

@@ -7,6 +7,8 @@ const Sellers = require('./models/sellers')
 const Products = require('./models/products')
 const Orders = require('./models/orders')
 const OrderLines = require('./models/orderLines')
+const Tickets = require('./models/tickets')
+const Reports = require('./models/reports')
 
 const sendMail = require('./mail')
 
@@ -70,11 +72,13 @@ async function getFullStats () {
     await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
     await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
     await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
+    await getData(Products.uri, Products.filename, Products.headers, Products.detail)
+    await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
+    await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
     await sendMail().catch(console.error);
     server.close(() => {
         console.log('Http server closed.');
     });
 }
 
-// getData(Products.uri, Products.filename, Products.headers, Products.detail)
 getFullStats()
