@@ -9,6 +9,7 @@ const Orders = require('./models/orders')
 const OrderLines = require('./models/orderLines')
 const Tickets = require('./models/tickets')
 const Reports = require('./models/reports')
+const Customers = require('./models/customers')
 
 const sendMail = require('./mail')
 
@@ -69,12 +70,13 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, page 
 }
 
 async function getFullStats () {
-    await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
-    await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
-    await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
-    await getData(Products.uri, Products.filename, Products.headers, Products.detail)
-    await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
-    await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
+    // await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
+    // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
+    // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
+    // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
+    // await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
+    // await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
+    await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
     await sendMail().catch(console.error);
     server.close(() => {
         console.log('Http server closed.');
