@@ -7,7 +7,7 @@ exports.detail = data => {
         id: data.id,
         name: data.name,
         email: data.email,
-        club_number: data.custom_field_values.data.length > 0 ? data.custom_field_values.data[0].value.data.value : '',
+        club_number: data.additional_information.club_code.value,
         orders: data.order_sellers.data.length,
         created_at: moment(data.created_at).format('L')
     }

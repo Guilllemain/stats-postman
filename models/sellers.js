@@ -12,6 +12,7 @@ exports.detail = data => {
         bank: data.bank_accounts.data[0] ? data.bank_accounts.data[0].bank_name : '',
         iban: data.bank_accounts.data[0] ? data.bank_accounts.data[0].iban : '',
         bic: data.bank_accounts.data[0] ? data.bank_accounts.data[0].bic : '',
+        reviews_amount: data.reviews.data.length
     }
 };
 
@@ -28,8 +29,9 @@ exports.headers = [
     { id: 'bank', title: 'Banque' },
     { id: 'iban', title: 'IBAN' },
     { id: 'bic', title: 'BIC' },
+    { id: 'reviews_amount', title: 'Nombre avis' },
 ]
 
 exports.filename = 'sellers.csv'
 
-exports.uri = '/v1/sellers?include=bank_accounts'
+exports.uri = '/v1/sellers?include=bank_accounts,reviews'
