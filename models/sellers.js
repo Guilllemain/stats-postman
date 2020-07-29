@@ -12,6 +12,8 @@ exports.detail = data => {
         bank: data.bank_accounts.data[0] ? data.bank_accounts.data[0].bank_name : '',
         iban: data.bank_accounts.data[0] ? data.bank_accounts.data[0].iban : '',
         bic: data.bank_accounts.data[0] ? data.bank_accounts.data[0].bic : '',
+        DS_account_number: data.additional_information.dropshipping_waiting_account_number.value,
+        MP_account_number: data.additional_information.marketplace_seller_account_number.value,
         reviews_amount: data.reviews.data.length
     }
 };
@@ -29,9 +31,11 @@ exports.headers = [
     { id: 'bank', title: 'Banque' },
     { id: 'iban', title: 'IBAN' },
     { id: 'bic', title: 'BIC' },
+    { id: 'DS_account_number', title: 'Compte DS' },
+    { id: 'MP_account_number', title: 'Compte MP' },
     { id: 'reviews_amount', title: 'Nombre avis' },
 ]
 
 exports.filename = 'sellers.csv'
 
-exports.uri = '/v1/sellers?include=bank_accounts,reviews'
+exports.uri = '/v1/sellers?include=bank_accounts,reviews,additionnal_information'

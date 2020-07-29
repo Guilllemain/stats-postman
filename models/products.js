@@ -24,28 +24,28 @@ const headers = [
 ]
 
 exports.detail = product => {
-    console.log(product)
+    console.log(product.id)
     const products = []
     product.variants.data.forEach(variant => {
         const Product = {
             id: product.id,
-            // reference_product: product.reference,
-            // variant_id: variant.id,
-            // reference_variant: variant.reference,
-            // ean: variant.ean13,
-            // created_at: moment(product.created_at).format('L'),
-            // updated_at: moment(product.updated_at).format('L'),
-            // name: product.translations.data[0].name,
-            // long_description: product.translations.data[0].description,
-            // short_description: product.translations.data[0].description_short,
-            // category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
-            // seller: variant.offers.data.length > 0 ? variant.offers.data[0].seller.data.name : '',
-            // stock: variant.offers.data.length > 0 ? variant.offers.data[0].quantity : '',
-            // price: variant.offers.data.length > 0 ? variant.offers.data[0].price_tax_exc : '',
-            // tax: variant.offers.data.length > 0 ? variant.offers.data[0].tax.data.value : '',
-            // reviews_amount: product.product_reviews.data.length,
-            // url: product.url_front,
-            // state: product.state
+            reference_product: product.reference,
+            variant_id: variant.id,
+            reference_variant: variant.reference,
+            ean: variant.ean13,
+            created_at: moment(product.created_at).format('L'),
+            updated_at: moment(product.updated_at).format('L'),
+            name: product.translations.data[0].name,
+            long_description: product.translations.data[0].description,
+            short_description: product.translations.data[0].description_short,
+            category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
+            seller: variant.offers.data.length > 0 ? variant.offers.data[0].seller.data.name : '',
+            stock: variant.offers.data.length > 0 ? variant.offers.data[0].quantity : '',
+            price: variant.offers.data.length > 0 ? variant.offers.data[0].price_tax_exc : '',
+            tax: variant.offers.data.length > 0 && variant.offers.data[0].tax ? variant.offers.data[0].tax.data.value : '',
+            reviews_amount: product.product_reviews.data.length,
+            url: product.url_front,
+            state: product.state
         }
         if (variant.attributes.data.length > 0) {
             variant.attributes.data.forEach((attribute) => {
