@@ -78,7 +78,7 @@ async function getFullStats () {
     // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
     // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
     // await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
-    // await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
+    await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
     // await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
     // await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
     // await sendMail().catch(console.error);

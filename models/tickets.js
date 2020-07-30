@@ -18,7 +18,8 @@ exports.detail = data => {
             created_at: moment(data.created_at).format('L'),
             updated_at: moment(data.updated_at).format('L'),
             order_number: data.order_seller ? data.order_seller.data.reference : '',
-            subject: message.subject,
+            from: message.user.data.roles.data[0].type,
+            subject: data.subject,
             message: message.body,
             message_created_at: moment(message.created_at).format('L'),
             seller: data.seller ? data.seller.data.name : '',
@@ -34,6 +35,7 @@ exports.headers = [
     { id: 'created_at', title: 'Date de creation' },
     { id: 'updated_at', title: 'Date de modification' },
     { id: 'order_number', title: 'Commande' },
+    { id: 'from', title: 'De' },
     { id: 'subject', title: 'Sujet' },
     { id: 'message', title: 'Message' },
     { id: 'message_created_at', title: 'Date du message' },
@@ -43,4 +45,4 @@ exports.headers = [
 
 exports.filename = 'tickets.csv'
 
-exports.uri = '/v1/tickets?include=messages,seller,order_seller,tags'
+exports.uri = '/v1/tickets?include=messages.user.roles,seller,order_seller,tags'
