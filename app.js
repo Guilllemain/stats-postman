@@ -68,19 +68,20 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, page 
             .then(() => console.log(`The file ${filename} was written successfully`));
     } catch (error) {
         console.error(error)
+        if (error.response.status === 401) console.log('You need a new access token')
     }
 }
 
 async function getFullStats () {
-    // await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
-    // await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
-    // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
-    // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
-    // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
-    // await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
+    await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
+    await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
+    await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
+    await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
+    await getData(Products.uri, Products.filename, Products.headers, Products.detail)
+    await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
     await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
-    // await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
-    // await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
+    await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
+    await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
     // await sendMail().catch(console.error);
     server.close(() => {
         console.log('Http server closed.');

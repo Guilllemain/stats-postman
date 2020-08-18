@@ -24,7 +24,6 @@ const headers = [
 ]
 
 exports.detail = product => {
-    console.log(product.id)
     const products = []
     product.variants.data.forEach(variant => {
         const Product = {
