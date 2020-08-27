@@ -15,6 +15,8 @@ const ProductsReviews = require('./models/products_reviews')
 
 const sendMail = require('./mail')
 
+const cleanFinanceReport = require('./functions/clean_finance_report')
+
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -29,7 +31,7 @@ server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-axios.defaults.headers.common = { 'Authorization': `Bearer ${access_token}` }
+// axios.defaults.headers.common = { 'Authorization': `Bearer ${access_token}` }
 
 const getToken = async() => {
     try {
@@ -72,20 +74,24 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, page 
     }
 }
 
-async function getFullStats () {
-    await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
-    await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
-    await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
-    await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
-    await getData(Products.uri, Products.filename, Products.headers, Products.detail)
-    await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
-    await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
-    await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
-    await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
+
+async function getFullStats() {
+    await getToken()
+    await cleanFinanceReport(base_uri, 291)
+    // await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
+    // await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
+    // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
+    // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
+    // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
+    // await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
+    // await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
+    // await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
+    // await getData(Customers.uri, Customers.filename, Customers.headers, Customers.detail)
     // await sendMail().catch(console.error);
     server.close(() => {
         console.log('Http server closed.');
     });
 }
+
 
 getFullStats()
