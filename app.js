@@ -1,7 +1,7 @@
 const http = require('http');
 const axios = require('axios');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-const { base_uri, access_token, grant_type, username, password, client_id, client_secret } = require('./config');
+const { base_uri } = require('./config');
 
 const Sellers = require('./models/sellers')
 const Products = require('./models/products')
@@ -16,6 +16,8 @@ const ProductsReviews = require('./models/products_reviews')
 const sendMail = require('./mail')
 
 const cleanFinanceReport = require('./functions/clean_finance_report')
+const getToken = require('./functions/auth')
+const moment = require('moment');
 
 
 const hostname = '127.0.0.1';
@@ -31,35 +33,26 @@ server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-// axios.defaults.headers.common = { 'Authorization': `Bearer ${access_token}` }
 
-const getToken = async() => {
-    try {
-        const { data } = await axios.post(`${base_uri}/oauth/token`, {
-            grant_type,
-            username,
-            password,
-            client_id,
-            client_secret
-        })
-        axios.defaults.headers.common = { 'Authorization': `Bearer ${data.access_token}` }
-    } catch(error) {
-        console.error(error)
-    }
-}
-
-const extractDataFromResponse = (response, data_type, variable_name, nested = false) => {
+const extractDataFromResponse = (response, data_type, final_data, period) => {
     response.forEach(data => {
-        variable_name.push(data_type(data))
+        if (period && (moment(data.date_order) < moment().subtract(15, 'days'))) {
+            final_data['stop_extract'] = true
+            return
+        }
+        console.log(data.date_order)
+        final_data.push(data_type(data))
     })
 }
 
-const getData = async (uri, filename = 'response.csv', headers, data_type, page = 1, final_data = []) => {
+const getData = async (uri, filename = 'response.csv', headers, data_type, period = false, page = 1, final_data = []) => {
     try {
+        final_data['stop_extract'] = false
         const { data: { data: raw_response }, data: { meta: pagination } } = await axios.get(`${base_uri}${uri}&context[user_group_id]=1&page=${page}`)
-        extractDataFromResponse(raw_response, data_type, final_data)
-        if (pagination.pagination.current_page <= pagination.pagination.total_pages) {
-            return getData(uri, filename, headers, data_type, pagination.pagination.current_page + 1, final_data)
+        extractDataFromResponse(raw_response, data_type, final_data, period)
+        console.log(final_data['stop_extract'])
+        if (pagination.pagination.current_page <= pagination.pagination.total_pages && final_data['stop_extract'] === false) {
+            return getData(uri, filename, headers, data_type, period, pagination.pagination.current_page + 1, final_data)
         }
         createCsvWriter({
             path: `./stats/${filename}`,
@@ -77,10 +70,9 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, page 
 
 async function getFullStats() {
     await getToken()
-    await cleanFinanceReport(base_uri, 291)
-    // await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
+    await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
     // await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
-    // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
+    // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail, true)
     // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
     // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
     // await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)

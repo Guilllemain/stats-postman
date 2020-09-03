@@ -1,4 +1,10 @@
 exports.detail = data => {
+    let corsica = false
+    data.shipping_offers.data.forEach(offer => {
+        offer.shipping_offer_zones.data.forEach(zone => {
+            if (zone.id_zone === 7) corsica = true
+        })
+    })
     return {
         id: data.id,
         state: data.is_active,
@@ -14,7 +20,8 @@ exports.detail = data => {
         bic: data.bank_accounts.data[0] ? data.bank_accounts.data[0].bic : '',
         DS_account_number: data.additional_information.dropshipping_waiting_account_number.value,
         MP_account_number: data.additional_information.marketplace_seller_account_number.value,
-        reviews_amount: data.reviews.data.length
+        reviews_amount: data.reviews.data.length,
+        corsica: corsica ? "Oui" : "Non"
     }
 };
 
@@ -34,8 +41,9 @@ exports.headers = [
     { id: 'DS_account_number', title: 'Compte DS' },
     { id: 'MP_account_number', title: 'Compte MP' },
     { id: 'reviews_amount', title: 'Nombre avis' },
+    { id: 'corsica', title: 'Corse' },
 ]
 
 exports.filename = 'sellers.csv'
 
-exports.uri = '/v1/sellers?include=bank_accounts,reviews,additionnal_information'
+exports.uri = '/v1/sellers?include=bank_accounts,reviews,additionnal_information,shipping_offers.shipping_offer_zones'

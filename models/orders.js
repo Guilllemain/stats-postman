@@ -44,4 +44,4 @@ exports.headers = [
 
 exports.filename = 'orders.csv'
 
-exports.uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,customer'
+exports.uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,customer&order[name]=id&order[way]=desc'
