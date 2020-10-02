@@ -6,6 +6,7 @@ exports.detail = data => {
     return {
         id: data.id,
         reference: data.reference,
+        type: data.type === "quote" ? "Devis" : "Commande",
         date: moment(data.date_order).format('L'),
         time: moment(data.date_order).format('LT'),
         total: data.total_tax_inc,
@@ -26,6 +27,7 @@ exports.detail = data => {
 exports.headers = [
     { id: 'id', title: 'ID' },
     { id: 'reference', title: 'Reference' },
+    { id: 'type', title: 'Type' },
     { id: 'date', title: 'Date' },
     { id: 'time', title: 'Heure' },
     { id: 'total', title: 'Total TTC' },

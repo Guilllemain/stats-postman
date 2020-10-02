@@ -19,6 +19,8 @@ exports.detail = data => {
         total_tax_inc: data.total_tax_inc,
         total_fees_amount_tax_exc: data.total_fees_amount_tax_exc,
         total_fees_amount_tax_inc: data.total_fees_amount,
+        total_refunds: data.total_refunds,
+        total_refunds_fees: data.total_refunds_fees,
         seller: data.seller.data.name,
         orders
     }
@@ -37,6 +39,8 @@ exports.headers = [
     { id: 'total_tax_inc', title: 'Total TTC' },
     { id: 'total_fees_amount_tax_exc', title: 'Comission HT' },
     { id: 'total_fees_amount_tax_inc', title: 'Comission TTC' },
+    { id: 'total_refunds', title: 'Commandes remboursees TTC' },
+    { id: 'total_refunds_fees', title: 'Comissions remboursees TTC' },
     { id: 'seller', title: 'Vendeur' },
     { id: 'orders', title: 'Commandes' }
 ]
