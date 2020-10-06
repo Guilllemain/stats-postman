@@ -114,22 +114,44 @@ async function getFullStats() {
     });
 }
 
-getFullStats()
+// getFullStats()
 
 
-const rewriteDescription = async() => {
+const rewriteDescription = async(page = 1) => {
     try {
         await getToken()
-        const { data: { data: response } } = await axios.get(`${ base_uri }/v1/catalog/products/11502?context[user_group_id]=1`)
-        console.log(response.translations.data[0].description.includes('Si le montant de votre commande ne d&eacute;passe'))
-        const raw = response.translations.data[0].description.substring(0, response.translations.data[0].description.indexOf('carte cadeau') - 12)
-        console.log(raw)
-        
+        console.log(page)
+        const { data: { data: response }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers?context[user_group_id]=1&include=product&filter[seller_id]=2717&page=${page}`)
+        response.forEach(async offer => {
+            if (offer.product.data.translations.data[0].description && offer.product.data.translations.data[0].description.toLowerCase().includes('<h3>notre test')) {
+                console.log(offer.product_id)
+                const formattedDescription = offer.product.data.translations.data[0].description.substring(0, offer.product.data.translations.data[0].description.toLowerCase().indexOf(`<h3>notre test`))
+                console.log(formattedDescription)
+                try {
+                    await axios.patch(`${base_uri}/v1/catalog/products/${offer.product_id}?context[user_group_id]=1`, {
+                        translations: [{
+                            language_id: 1,
+                            name: offer.product.data.translations.data[0].name,
+                            description: formattedDescription,
+                        }],
+                    })
+                } catch (error) {
+                    console.log(error.response.data)
+                }
+            }
+        })
+        if (pagination.pagination.current_page <= pagination.pagination.total_pages) {
+            return rewriteDescription(pagination.pagination.current_page + 1)
+        }
+        // const raw = response.translations.data[0].description.substring(0, response.translations.data[0].description.toLowerCase().indexOf(`<h2><b>notre test`))
+        // console.log(raw)        
     }
     catch (error) {
         console.log(error)
     }
 }
+
+rewriteDescription()
 
 
 // desactivate Wilson, occasion and products without images
@@ -193,3 +215,37 @@ const desactivateProducts = async(page = 39) => {
 
 // getExtremeTennisCatalog(ExtremeTennis.filename, ExtremeTennis.headers, ExtremeTennis.detail)
 
+
+// desactivate Wilson, occasion and products without images
+const addFeature = async (page = 1) => {
+    try {
+        await getToken()
+        console.log(page)
+        const { data: { data: response }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers?context[user_group_id]=1&include=product.features&filter[seller_id]=90&page=${page}`)
+        response.forEach(async offer => {
+            if (offer.product.data.features.data.some(feature => feature.feature_type_id === 28)) {
+                try {
+                    await axios.patch(`${base_uri}/v1/catalog/products/${offer.product_id}?context[user_group_id]=1`, {
+                        features: [
+                            {
+                                feature_type_id: 28,
+                                feature_value_id: 1686,
+                                is_custom: 0
+                            }
+                        ]
+                    })
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        })
+        if (pagination.pagination.current_page <= pagination.pagination.total_pages) {
+            return addFeature(pagination.pagination.current_page + 1)
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+// addFeature()

@@ -15,7 +15,8 @@
   },
   "scripts": {
     "start": "node app.js",
-    "clean": "node cleanReport.js"
+    "clean": "node cleanReport.js",
+    "addReport": "node addOrdersReport.js"
   },
   "author": "",
   "license": "ISC"
