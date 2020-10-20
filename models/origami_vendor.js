@@ -34,7 +34,7 @@ exports.detail = product => {
         reference_product: product.reference,
         name: product.name,
         link: product.link,
-        category: product.categories[product.category_default].name,
+        // category: product.categories[product.category_default].name ? product.categories[product.category_default].name : '',
         description: product.description,
         description_short: product.description_short,
         quantity: product.quantity,
@@ -76,7 +76,7 @@ exports.detail = product => {
                 variant_reference: product.variants[variant_property].reference,
                 name: product.name,
                 link: product.link,
-                category: product.categories[product.category_default].name,
+                // category: product.categories[product.category_default].name,
                 description: product.description,
                 description_short: product.description_short,
                 quantity: product.variants[variant_property].quantity,
@@ -122,4 +122,4 @@ exports.detail = product => {
 
 exports.headers = headers
 
-exports.filename = 'extreme_tennis.csv'
+exports.filename = 'origami_vendor.csv'

@@ -1,7 +1,7 @@
 const addOrdersReport = require('./functions/add_orders_report')
 const getToken = require('./functions/auth')
 
-const orders = [1440, 925, 913, 1457, 1404, 1113, 923, 1096, 1104, 908, 949, 935, 1081, 943, 910, 937, 1102, 1103, 1063, 932, 920, 912, 924]
+const orders = [2862, 3282, 3180, 3308, 2810, 2842, 3090, 2960, 2801, 2984, 2961, 3182, 3018, 3008, 2639, 2880, 3095, 2871]
 
 async function add(reportID) {
     await getToken()

@@ -18,7 +18,7 @@ exports.detail = data => {
         customer_name: data.customer.data.name,
         customer_email: data.customer.data.email,
         seller: data.seller.data.name,
-        state: data.state.data.key,
+        state: data.state.data.name,
         shipping_name: data.shippingOffer ? data.shippingOffer.data.name : '',
         shipping_type: data.shippingOffer ? data.shippingOffer.data.shipping_type.data.translations.data[0].name : ''
     }
