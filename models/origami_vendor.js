@@ -10,6 +10,7 @@ const headers = [
     { id: 'ean', title: 'EAN13' },
     { id: 'name', title: 'Nom' },
     { id: 'link', title: 'Lien' },
+    { id: 'available_for_order', title: 'Actif' },
     { id: 'description', title: 'Description longue' },
     { id: 'description_short', title: 'Description courte' },
     { id: 'quantity', title: 'Quantity' },
@@ -34,7 +35,8 @@ exports.detail = product => {
         reference_product: product.reference,
         name: product.name,
         link: product.link,
-        // category: product.categories[product.category_default].name ? product.categories[product.category_default].name : '',
+        available_for_order: product.available_for_order ? "Oui" : "Non",
+        category: Object.keys(product.categories).map(key => product.categories[key].name),
         description: product.description,
         description_short: product.description_short,
         quantity: product.quantity,
@@ -69,6 +71,7 @@ exports.detail = product => {
     }
     if (Object.keys(product.variants).length > 0) {
         Object.getOwnPropertyNames(product.variants).forEach(variant_property => {
+            
             const Variant = {
                 id: product.id,
                 reference_product: product.reference,
@@ -76,7 +79,8 @@ exports.detail = product => {
                 variant_reference: product.variants[variant_property].reference,
                 name: product.name,
                 link: product.link,
-                // category: product.categories[product.category_default].name,
+                available_for_order: product.available_for_order ? "Oui" : "Non",
+                category: (Object.keys(product.categories).map(key => product.categories[key].name)).join(', '),
                 description: product.description,
                 description_short: product.description_short,
                 quantity: product.variants[variant_property].quantity,
@@ -88,7 +92,13 @@ exports.detail = product => {
                 ean: product.variants[variant_property].ean13,
                 weight: product.variants[variant_property].weight * 1000,
             }
-
+            if (product.images.length > 0) {
+                product.images.forEach((image, index) => {
+                    Object.defineProperty(Variant, `image_${index + 1}`, {
+                        value: image.url
+                    });
+                })
+            }
             Object.getOwnPropertyNames(product.variants[variant_property].attributes).forEach(attribute => {
                 if (!headers.some(header => header.id === `attribute_${product.variants[variant_property].attributes[attribute].id_attribute_group}`)) {
                     headers.push({ id: `attribute_${product.variants[variant_property].attributes[attribute].id_attribute_group}`, title: product.variants[variant_property].attributes[attribute].name_attribute_group })
@@ -116,7 +126,6 @@ exports.detail = product => {
     } else {
         products.push(Product)
     }
-
     return products
 };
 
