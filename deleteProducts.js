@@ -1,9 +1,9 @@
 const deleteProducts = require('./functions/delete_products')
 const getToken = require('./functions/auth')
 
-async function deleteProductsFromSeller(seller_id) {
+async function deleteProductsFromSeller() {
     await getToken()
-    await deleteProducts.deleteETproducts(seller_id)
+    await deleteProducts.deleteProducts(2717)
 }
 
-deleteProductsFromSeller(2717)
+deleteProductsFromSeller()

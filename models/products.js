@@ -14,11 +14,7 @@ const headers = [
     { id: 'long_description', title: 'Description longue' },
     { id: 'short_description', title: 'Description courte' },
     { id: 'category', title: 'Categorie' },
-    { id: 'seller', title: 'Vendeur' },
-    { id: 'stock', title: 'Stock' },
-    { id: 'price', title: 'Prix HT' },
-    { id: 'offer_id', title: 'ID offre' },
-    { id: 'tax_id', title: 'Taxe' },
+    { id: 'offers_quantity', title: 'Nombre offres' },
     { id: 'reviews_amount', title: 'Nombre avis' },
     { id: 'url', title: 'Lien' },
     { id: 'state', title: 'Statut' },
@@ -39,11 +35,7 @@ exports.detail = product => {
             long_description: product.translations.data[0].description,
             short_description: product.translations.data[0].description_short,
             category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
-            seller: variant.offers.data.length > 0 ? variant.offers.data[0].seller.data.name : '',
-            stock: variant.offers.data.length > 0 ? variant.offers.data[0].quantity : '',
-            price: variant.offers.data.length > 0 ? variant.offers.data[0].price_tax_exc : '',
-            offer_id: variant.offers.data.length > 0 ? variant.offers.data[0].id : '',
-            tax_id: variant.offers.data.length > 0 ? variant.offers.data[0].tax_id : '',
+            offer_quantity: variant.offers.data.length,
             reviews_amount: product.product_reviews.data.length,
             url: product.url_front,
             state: product.state
@@ -78,4 +70,4 @@ exports.headers = headers
 
 exports.filename = 'products.csv'
 
-exports.uri = '/v1/catalog/products?include=variants.attributes,variants.offers.seller,categories,features.feature_type,product_reviews'
+exports.uri = '/v1/catalog/products?include=variants.attributes,variants.offers,categories,features.feature_type,product_reviews'

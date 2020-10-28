@@ -8,6 +8,7 @@ const Products = require('./models/products')
 const Offers = require('./models/offers')
 const Orders = require('./models/orders')
 const OrderLines = require('./models/orderLines')
+const QuoteToOrder = require('./models/quote_to_order')
 const Tickets = require('./models/tickets')
 const Reports = require('./models/reports')
 const Customers = require('./models/customers')
@@ -67,14 +68,17 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, perio
     }
 }
 
+
+
 async function getFullStats() {
     await getToken()
     // await getData(Sellers.uri, Sellers.filename, Sellers.headers, Sellers.detail)
     // await getData(SellersReviews.uri, SellersReviews.filename, SellersReviews.headers, SellersReviews.detail)
     // await getData(Orders.uri, Orders.filename, Orders.headers, Orders.detail)
     // await getData(OrderLines.uri, OrderLines.filename, OrderLines.headers, OrderLines.detail)
+    await getData(QuoteToOrder.uri, QuoteToOrder.filename, QuoteToOrder.headers, QuoteToOrder.detail)
     // await getData(Products.uri, Products.filename, Products.headers, Products.detail)
-    await getData(Offers.uri, Offers.filename, Offers.headers, Offers.detail)
+    // await getData(Offers.uri, Offers.filename, Offers.headers, Offers.detail)
     // await getData(ProductsReviews.uri, ProductsReviews.filename, ProductsReviews.headers, ProductsReviews.detail)
     // await getData(Tickets.uri, Tickets.filename, Tickets.headers, Tickets.detail)
     // await getData(Reports.uri, Reports.filename, Reports.headers, Reports.detail)
@@ -85,23 +89,22 @@ async function getFullStats() {
     });
 }
 
-// getFullStats()
+getFullStats()
 
 
 const fetch = require("node-fetch");
 async function getOrigamiVendorCatalog(filename, headers, data_type, page = 1, final_data = []) {
-    const response = await fetch(`https://www.esprit-tennis.com/module/origamivendor/api?key=C13QTYL4150YAHRIDTG5UZCHDO1124CUT0FD0O919TNAZ61CJSMEDA1602692691&method=categories&page=${page}`)
+    const response = await fetch(`https://www.esprit-tennis.com/module/origamivendor/api?key=C13QTYL4150YAHRIDTG5UZCHDO1124CUT0FD0O919TNAZ61CJSMEDA1602692691&method=catalog&page=${page}`)
     if (response.ok) {
-        const categories = await response.json();
-        console.log(categories)
-        categories.forEach(product => {
+        const { products, pagination } = await response.json();
+        products.forEach(product => {
             final_data.push(data_type(product))
         })
 
-        // if (pagination.page_number < pagination.total_pages) {
-        //     console.log(pagination.page_number)
-        //     return getOrigamiVendorCatalog(filename, headers, data_type, pagination.page_number + 1, final_data)
-        // }
+        if (pagination.page_number < pagination.total_pages) {
+            console.log(pagination.page_number)
+            return getOrigamiVendorCatalog(filename, headers, data_type, pagination.page_number + 1, final_data)
+        }
 
         createCsvWriter({
             path: `./stats/${filename}`,
@@ -166,4 +169,4 @@ async function getOrigamiVendorCatalog(filename, headers, data_type, page = 1, f
 //     });
 // }
 
-getOrigamiVendorCatalog('esprit_tennis_categories.csv', OrigamiVendorCategories.headers, OrigamiVendorCategories.detail)
+// getOrigamiVendorCatalog('esprit_tennis.csv', OrigamiVendor.headers, OrigamiVendor.detail)
