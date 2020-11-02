@@ -26,9 +26,6 @@ const getToken = require('./auth')
 //     } else {
 //         console.log("HTTP-Error: " + response.status);
 //     }
-//     server.close(() => {
-//         console.log('Http server closed.');
-//     });
 // }
 
 
@@ -96,9 +93,6 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
             console.log(error.status, ' | ', offer.reference, ' --- ERROR ---')
         }
     }
-    server.close(() => {
-        console.log('Http server closed.');
-    });
 }
 
 updateOrigamiVendorCatalog()
