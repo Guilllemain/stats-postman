@@ -11,5 +11,9 @@ module.exports = {
     client_secret: process.env.CLIENT_SECRET,
     sendgrid_user: process.env.SENDGRID_USER,
     sendgrid_key: process.env.SENDGRID_KEY,
+    sendgrid_port: process.env.SENDGRID_PORT,
+    sendgrid_host: process.env.SENDGRID_HOST,
+    mail_from: process.env.MAIL_FROM,
+    mail_to: process.env.MAIL_TO,
     promotennis_url: process.env.PROMOTENNIS_URL
 };
