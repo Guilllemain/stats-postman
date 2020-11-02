@@ -55,4 +55,4 @@ async function getFullStats() {
 
 getFullStats()
 
-// updateOrigamiVendorCatalog('esprit_tennis.csv', OrigamiVendor.headers, OrigamiVendor.detail)
+// updateOrigamiVendorCatalog()

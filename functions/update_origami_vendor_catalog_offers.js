@@ -33,7 +33,7 @@ const getToken = require('./auth')
 
 
 const fetched_offers = []
-const updateOrigamiVendorCatalog = async (filename, headers, data_type, page = 1, final_data = []) => {
+const updateOrigamiVendorCatalog = async (page = 1) => {
     await getToken()
     console.log(page)
     try {
@@ -67,7 +67,7 @@ const updateOrigamiVendorCatalog = async (filename, headers, data_type, page = 1
         fetched_offers.push(offers.flat())
         
         if (pagination.page_number < pagination.total_pages) {
-            return updateOrigamiVendorCatalog(filename, headers, data_type, pagination.page_number + 1, final_data)
+            return updateOrigamiVendorCatalog(pagination.page_number + 1)
         }
     } catch (error) {
         console.log(error.status);
@@ -101,4 +101,4 @@ const updateOrigamiVendorCatalog = async (filename, headers, data_type, page = 1
     });
 }
 
-module.exports = updateOrigamiVendorCatalog
+updateOrigamiVendorCatalog()
