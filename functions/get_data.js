@@ -25,7 +25,7 @@ const getData = async (uri, filename = 'response.csv', headers, data_type, perio
             return getData(uri, filename, headers, data_type, period, pagination.pagination.current_page + 1, final_data)
         }
         createCsvWriter({
-            path: `./stats/${filename}`,
+            path: `./tmp/${filename}`,
             fieldDelimiter: ';',
             header: headers
         })
