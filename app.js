@@ -11,8 +11,6 @@ const Reports = require('./models/reports')
 const Customers = require('./models/customers')
 const SellersReviews = require('./models/sellers_reviews')
 const ProductsReviews = require('./models/products_reviews')
-const OrigamiVendor = require('./models/origami_vendor')
-const updateOrigamiVendorCatalog = require('./functions/update_origami_vendor_catalog_offers')
 
 const sendMail = require('./mail')
 
@@ -54,5 +52,3 @@ async function getFullStats() {
 }
 
 getFullStats()
-
-// updateOrigamiVendorCatalog()
