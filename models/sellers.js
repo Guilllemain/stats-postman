@@ -1,4 +1,4 @@
-exports.detail = data => {
+const detail = data => {
     let corsica = false
     data.shipping_offers.data.forEach(offer => {
         offer.shipping_offer_zones.data.forEach(zone => {
@@ -25,7 +25,7 @@ exports.detail = data => {
     }
 };
 
-exports.headers = [
+const headers = [
     { id: 'id', title: 'ID' },
     { id: 'state', title: 'Statut' },
     { id: 'name', title: 'Nom' },
@@ -44,6 +44,18 @@ exports.headers = [
     { id: 'corsica', title: 'Corse' },
 ]
 
-exports.filename = 'sellers.csv'
+const filename = 'sellers.csv'
 
-exports.uri = '/v1/sellers?include=bank_accounts,reviews,additionnal_information,shipping_offers.shipping_offer_zones'
+const uri = '/v1/sellers?include=bank_accounts,reviews,additionnal_information,shipping_offers.shipping_offer_zones'
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]   
+}

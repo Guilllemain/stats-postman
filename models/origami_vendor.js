@@ -28,7 +28,7 @@ const headers = [
     { id: 'category', title: 'Categorie' },
 ]
 
-exports.detail = product => {
+const detail = product => {
     const products = []
     const Product = {
         id: product.id,
@@ -129,6 +129,4 @@ exports.detail = product => {
     return products
 };
 
-exports.headers = headers
-
-exports.filename = 'origami_vendor.csv'
+const filename = 'origami_vendor.csv'

@@ -2,7 +2,7 @@
 const axios = require('axios');
 const { base_uri } = require('../config');
 
-const update_offers = async (offers) => {
+module.exports = async (offers) => {
     for (let i = 0; i < offers.length; i++) {
         const offer = offers[i]
         try {
@@ -15,5 +15,3 @@ const update_offers = async (offers) => {
         }
     }
 }
-
-module.exports.update_offers = update_offers

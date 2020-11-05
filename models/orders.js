@@ -1,8 +1,9 @@
 const moment = require('moment')
-
 moment.locale('fr')
 
-exports.detail = data => {
+
+// orders file
+const orders_detail = data => {
     return {
         id: data.id,
         reference: data.reference,
@@ -24,7 +25,7 @@ exports.detail = data => {
     }
 };
 
-exports.headers = [
+const orders_headers = [
     { id: 'id', title: 'ID' },
     { id: 'reference', title: 'Reference' },
     { id: 'type', title: 'Type' },
@@ -44,6 +45,57 @@ exports.headers = [
     { id: 'shipping_type', title: 'Type transport' }
 ]
 
-exports.filename = 'orders.csv'
+const orders_filename = 'orders.csv'
 
-exports.uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,customer&order[name]=id&order[way]=desc'
+const uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,customer&order[name]=id&order[way]=desc'
+
+
+// order lines file
+const order_lines_detail = data => {
+    const product_lines = []
+    data.orderLines.data.forEach(line => {
+        product_lines.push({
+            id: data.id,
+            seller: data.seller.data.name,
+            product_id: line.product_id,
+            variant_id: line.product_variant_id,
+            name: line.name,
+            quantity: line.quantity,
+            price: line.unit_price_tax_inc,
+            reduction: line.reduction_percent
+        })
+    })
+    return product_lines
+}
+
+const order_lines_headers = [
+    { id: 'id', title: 'ID' },
+    { id: 'seller', title: 'Vendeur' },
+    { id: 'product_id', title: 'ID produit' },
+    { id: 'variant_id', title: 'ID variante' },
+    { id: 'name', title: 'Nom' },
+    { id: 'quantity', title: 'Quantite' },
+    { id: 'price', title: 'Prix TTC' },
+    { id: 'reduction', title: 'Reduction %' }
+]
+
+const order_lines_filename = 'order_lines.csv'
+
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail: orders_detail,
+            headers: orders_headers,
+            filename: orders_filename,
+            final_data: []
+        },
+        {
+            detail: order_lines_detail,
+            headers: order_lines_headers,
+            filename: order_lines_filename,
+            final_data: []
+        },
+    ]
+}

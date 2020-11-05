@@ -1,4 +1,4 @@
-exports.detail = data => {
+const detail = data => {
     const orders = []
     if (data.order_sellers.data.length > 0) {
         data.order_sellers.data.forEach(order => {
@@ -26,7 +26,7 @@ exports.detail = data => {
     }
 }
 
-exports.headers = [
+const headers = [
     { id: 'id', title: 'ID' },
     { id: 'start_date', title: 'Debut' },
     { id: 'end_date', title: 'Fin' },
@@ -45,6 +45,18 @@ exports.headers = [
     { id: 'orders', title: 'Commandes' }
 ]
 
-exports.filename = 'reports.csv'
+const filename = 'reports.csv'
 
-exports.uri = '/v1/payments/reports?include=seller,order_sellers'
+const uri = '/v1/payments/reports?include=seller,order_sellers'
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

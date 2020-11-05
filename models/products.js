@@ -20,7 +20,7 @@ const headers = [
     { id: 'state', title: 'Statut' },
 ]
 
-exports.detail = product => {
+const detail = product => {
     const products = []
     product.variants.data.forEach(variant => {
         const Product = {
@@ -66,8 +66,18 @@ exports.detail = product => {
     return products
 };
 
-exports.headers = headers
+const filename = 'products.csv'
 
-exports.filename = 'products.csv'
+const uri = '/v1/catalog/products?include=variants.attributes,variants.offers,categories,features.feature_type,product_reviews'
 
-exports.uri = '/v1/catalog/products?include=variants.attributes,variants.offers,categories,features.feature_type,product_reviews'
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

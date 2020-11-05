@@ -2,35 +2,38 @@ const axios = require('axios')
 const moment = require('moment')
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const { base_uri } = require('../config');
+const uploadToFtp = require('./upload_to_ftp')
+
 
 moment.locale('fr')
 
 const extractDataFromResponse = (response, data_type, final_data, period) => {
     response.forEach(data => {
-        if (period && (moment(data.date_order) < moment().subtract(15, 'days').startOf('day'))) {
-            final_data['stop_extract'] = true
-            return
-        }
         final_data.push(data_type(data))
     })
 }
-
-const getData = async (uri, filename = 'response.csv', headers, data_type, period = false, page = 1, final_data = []) => {
+const getData = async (data, page = 1) => {
     try {
         console.log(page)
-        final_data['stop_extract'] = false
-        const { data: { data: raw_response }, data: { meta: pagination } } = await axios.get(`${base_uri}${uri}&context[user_group_id]=1&page=${page}`)
-        extractDataFromResponse(raw_response, data_type, final_data, period)
-        if (pagination.pagination.current_page <= pagination.pagination.total_pages && final_data['stop_extract'] === false) {
-            return getData(uri, filename, headers, data_type, period, pagination.pagination.current_page + 1, final_data)
+        const { data: { data: raw_response }, data: { meta: pagination } } = await axios.get(`${base_uri}${data.uri}&context[user_group_id]=1&page=${page}`)
+        
+        data.models.forEach(model => extractDataFromResponse(raw_response, model.detail, model.final_data))
+        if (pagination.pagination.current_page <= pagination.pagination.total_pages) {
+            return getData(data, pagination.pagination.current_page + 1)
         }
-        createCsvWriter({
-            path: `${filename}`,
-            fieldDelimiter: ';',
-            header: headers
+        
+        data.models.forEach(model => {
+            createCsvWriter({
+                path: `./${model.filename}`,
+                fieldDelimiter: ';',
+                header: model.headers
+            })
+            .writeRecords(model.final_data.flat())
+            .then(() => console.log(`The file ${model.filename} was written successfully`));
         })
-            .writeRecords(final_data.flat())
-            .then(() => console.log(`The file ${filename} was written successfully`));
+
+        uploadToFtp(data.models)
+
     } catch (error) {
         console.error(error)
         if (error.response.status === 401) console.log('You need a new access token')

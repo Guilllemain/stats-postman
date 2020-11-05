@@ -5,7 +5,7 @@ const offers = []
 
 async function update() {
     await getToken()
-    await updateOffers.update_offers(offers)
+    await updateOffers(offers)
 }
 
 update()

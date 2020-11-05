@@ -2,7 +2,7 @@ const moment = require('moment')
 
 moment.locale('fr')
 
-exports.detail = data => {
+const detail = data => {
     return {
         id: data.id,
         name: data.name,
@@ -13,7 +13,7 @@ exports.detail = data => {
     }
 };
 
-exports.headers = [
+const headers = [
     { id: 'id', title: 'ID' },
     { id: 'name', title: 'Nom' },
     { id: 'email', title: 'Email' },
@@ -22,6 +22,18 @@ exports.headers = [
     { id: 'created_at', title: 'Inscrit le' }
 ]
 
-exports.filename = 'customers.csv'
+const filename = 'customers.csv'
 
-exports.uri = '/v1/customers?include=order_sellers,custom_field_values.value'
+const uri = '/v1/customers?include=order_sellers,custom_field_values.value'
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

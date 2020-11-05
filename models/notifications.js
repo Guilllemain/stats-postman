@@ -2,7 +2,7 @@ const moment = require('moment')
 
 moment.locale('fr')
 
-exports.detail = data => {
+const detail = data => {
     return {
         id: data.id,
         subject: data.subject,
@@ -13,7 +13,7 @@ exports.detail = data => {
     }
 };
 
-exports.headers = [
+const headers = [
     { id: 'id', title: 'ID' },
     { id: 'subject', title: 'Sujet' },
     { id: 'email', title: 'Email' },
@@ -22,6 +22,18 @@ exports.headers = [
     { id: 'created_at', title: 'Envoyé le' }
 ]
 
-exports.filename = 'notifications.csv'
+const filename = 'notifications.csv'
 
-exports.uri = '/v1/notifications/logs?filter[type]=mail'
+const uri = '/v1/notifications/logs?filter[type]=mail'
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

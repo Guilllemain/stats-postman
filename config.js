@@ -15,5 +15,8 @@ module.exports = {
     sendgrid_host: process.env.SENDGRID_HOST,
     mail_from: process.env.MAIL_FROM,
     mail_to: process.env.MAIL_TO,
-    promotennis_url: process.env.PROMOTENNIS_URL
+    promotennis_url: process.env.PROMOTENNIS_URL,
+    ftp_host: process.env.FTP_HOST,
+    ftp_user: process.env.FTP_USER,
+    ftp_password: process.env.FTP_PASSWORD,
 };

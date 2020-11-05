@@ -13,7 +13,7 @@ const headers = [
     { id: 'is_active', title: 'Actif' },
 ]
 
-exports.detail = offer => {
+const detail = offer => {
         return {
             id: offer.id,
             seller_id: offer.seller_id,
@@ -30,8 +30,18 @@ exports.detail = offer => {
         }
 };
 
-exports.headers = headers
+const filename = 'offers.csv'
 
-exports.filename = 'offers.csv'
+const uri = '/v1/catalog/products/variants/offers?context[user_group_id]=1'
 
-exports.uri = '/v1/catalog/products/variants/offers?context[user_group_id]=1'
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

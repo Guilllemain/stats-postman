@@ -2,7 +2,7 @@ const moment = require('moment')
 
 moment.locale('fr')
 
-exports.detail = data => {
+const detail = data => {
     const lines = []
     const tags = []
     if (data.tags.data.length > 0) {
@@ -29,7 +29,7 @@ exports.detail = data => {
     return lines
 }
 
-exports.headers = [
+const headers = [
     { id: 'id', title: 'ID' },
     { id: 'status', title: 'Statut' },
     { id: 'created_at', title: 'Date de creation' },
@@ -43,6 +43,18 @@ exports.headers = [
     { id: 'tags', title: 'Tags' }
 ]
 
-exports.filename = 'tickets.csv'
+const filename = 'tickets.csv'
 
-exports.uri = '/v1/tickets?include=messages.user.roles,seller,order_seller,tags'
+const uri = '/v1/tickets?include=messages.user.roles,seller,order_seller,tags'
+
+module.exports = {
+    uri,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}
