@@ -1,3 +1,5 @@
+const { base_uri } = require('../config');
+const axios = require('axios')
 const moment = require('moment')
 
 moment.locale('fr')
@@ -14,61 +16,72 @@ const headers = [
     { id: 'long_description', title: 'Description longue' },
     { id: 'short_description', title: 'Description courte' },
     { id: 'category', title: 'Categorie' },
-    { id: 'offers_quantity', title: 'Nombre offres' },
     { id: 'reviews_amount', title: 'Nombre avis' },
     { id: 'url', title: 'Lien' },
     { id: 'state', title: 'Statut' },
+    { id: 'meta_title', title: 'Meta title' },
+    { id: 'meta_description', title: 'Meta description' }
 ]
 
-const detail = product => {
-    const products = []
-    product.variants.data.forEach(variant => {
-        const Product = {
-            id: product.id,
-            reference_product: product.reference,
-            variant_id: variant.id,
-            reference_variant: variant.reference,
-            ean: variant.ean13,
-            created_at: moment(product.created_at).format('L'),
-            updated_at: moment(product.updated_at).format('L'),
-            name: product.translations.data[0].name,
-            long_description: product.translations.data[0].description,
-            short_description: product.translations.data[0].description_short,
-            category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
-            offer_quantity: variant.offers.data.length,
-            reviews_amount: product.product_reviews.data.length,
-            url: product.url_front,
-            state: product.state
-        }
-        if (variant.attributes.data.length > 0) {
-            variant.attributes.data.forEach((attribute) => {
-                if (!headers.some(header => header.id === `attribute_${attribute.attribute_type_id}`)) {
-                    headers.push({ id: `attribute_${attribute.attribute_type_id}`, title: attribute.attribute_type.data.translations.data[0].name})
-                }
-                Object.defineProperty(Product, `attribute_${attribute.attribute_type_id}`, {
-                    value: attribute.attribute_value.data.translations.data[0].name
-                });
-            })
-        }
+const detail = async product => {
+    try {
+        const products = []
+        const { data: { data: variants } } = await axios.get(`${base_uri}/v1/catalog/products/variants?context[user_group_id]=1&include=attributes&filter[product_id]=${product.id}`)
+        
+        variants.forEach(variant => {
 
-        if (product.features.data.length > 0) {
-            product.features.data.forEach((feature) => {
-                if (!headers.some(header => header.id === `feature_${feature.feature_type.data.id}`)) {
-                    headers.push({ id: `feature_${feature.feature_type.data.id}`, title: feature.feature_type.data.translations.data[0].name })
-                }
-                Object.defineProperty(Product, `feature_${feature.feature_type.data.id}`, {
-                    value: feature.translations.data[0].value
-                });
-            })
-        }
-        products.push(Product)
-    })
-    return products
+            const Product = {
+                id: product.id,
+                reference_product: product.reference,
+                variant_id: variant.id,
+                reference_variant: variant.reference,
+                ean: variant.ean13,
+                created_at: moment(product.created_at).format('L'),
+                updated_at: moment(product.updated_at).format('L'),
+                name: product.translations.data[0].name,
+                long_description: product.translations.data[0].description,
+                short_description: product.translations.data[0].description_short,
+                category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
+                reviews_amount: product.product_reviews.data.length,
+                url: product.url_front,
+                state: product.state,
+                meta_title: product.translations.data[0].meta_title,
+                meta_description: product.translations.data[0].meta_description
+            }
+            if (variant.attributes.data.length > 0) {
+                variant.attributes.data.forEach((attribute) => {
+                    if (!headers.some(header => header.id === `attribute_${attribute.attribute_type_id}`)) {
+                        headers.push({ id: `attribute_${attribute.attribute_type_id}`, title: attribute.attribute_type.data.translations.data[0].name })
+                    }
+                    Object.defineProperty(Product, `attribute_${attribute.attribute_type_id}`, {
+                        value: attribute.attribute_value.data.translations.data[0].name
+                    });
+                })
+            }
+
+            if (product.features.data.length > 0) {
+                product.features.data.forEach((feature) => {
+                    if (!headers.some(header => header.id === `feature_${feature.feature_type.data.id}`)) {
+                        headers.push({ id: `feature_${feature.feature_type.data.id}`, title: feature.feature_type.data.translations.data[0].name })
+                    }
+                    Object.defineProperty(Product, `feature_${feature.feature_type.data.id}`, {
+                        value: feature.translations.data[0].value
+                    });
+                })
+            }
+            products.push(Product)
+        })
+        
+        return products
+
+    } catch (error) {
+        console.log(error)
+    }
 };
 
 const filename = 'products.csv'
 
-const uri = '/v1/catalog/products?include=variants.attributes,variants.offers,categories,features.feature_type,product_reviews'
+const uri = '/v1/catalog/products?include=categories,features.feature_type,product_reviews'
 
 module.exports = {
     uri,

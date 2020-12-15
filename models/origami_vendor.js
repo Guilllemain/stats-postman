@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { promotennis_url } = require('../config');
 
 moment.locale('fr')
 
@@ -130,3 +131,15 @@ const detail = product => {
 };
 
 const filename = 'origami_vendor.csv'
+
+module.exports = {
+    uri: promotennis_url,
+    models: [
+        {
+            detail,
+            headers,
+            filename,
+            final_data: []
+        }
+    ]
+}

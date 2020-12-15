@@ -1,9 +1,9 @@
 const updateVariants = require('./functions/update_variants')
 const getToken = require('./functions/auth')
 
-async function update(seller_id) {
+async function update() {
     await getToken()
-    await updateVariants(seller_id)
+    await updateVariants()
 }
 
-update(process.argv[2]) // get the command line argument
+update() // get the command line argument
