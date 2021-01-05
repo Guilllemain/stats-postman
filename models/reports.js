@@ -1,29 +1,41 @@
-const detail = data => {
-    const orders = []
-    if (data.order_sellers.data.length > 0) {
-        data.order_sellers.data.forEach(order => {
-            orders.push(order.reference)
-        })
+const { base_uri } = require('../config');
+const axios = require('axios')
+
+const detail = async data => {
+
+    try {
+        const { data: { data: report} } = await axios.get(`${base_uri}/v1/payments/reports/${data.id}?context[user_group_id]=1&include=seller,order_sellers`)
+
+        const orders = []
+        if (report.order_sellers.data.length > 0) {
+            report.order_sellers.data.forEach(order => {
+                orders.push(order.id)
+            })
+        }
+        orders.join(', ')
+        
+        return {
+            id: report.id,
+            start_date: report.start_date,
+            end_date: report.end_date,
+            status: report.status,
+            total_products_tax_exc: report.total_products_tax_exc,
+            total_shipping_tax_exc: report.total_shipping_tax_exc,
+            total_shipping_tax_inc: report.total_shipping_tax_inc,
+            total_tax_exc: report.total_tax_exc,
+            total_paid_tax: report.total_paid_tax,
+            total_tax_inc: report.total_tax_inc,
+            total_fees_amount_tax_exc: report.total_fees_amount_tax_exc,
+            total_fees_amount_tax_inc: report.total_fees_amount,
+            total_refunds: report.total_refunds,
+            total_refunds_fees: report.total_refunds_fees,
+            seller: report.seller.data.name,
+            orders
+        }
+    } catch (error) {
+        console.log(error)
     }
-    orders.join(', ')
-    return {
-        id: data.id,
-        start_date: data.start_date,
-        end_date: data.end_date,
-        status: data.status,
-        total_products_tax_exc: data.total_products_tax_exc,
-        total_shipping_tax_exc: data.total_shipping_tax_exc,
-        total_shipping_tax_inc: data.total_shipping_tax_inc,
-        total_tax_exc: data.total_tax_exc,
-        total_paid_tax: data.total_paid_tax,
-        total_tax_inc: data.total_tax_inc,
-        total_fees_amount_tax_exc: data.total_fees_amount_tax_exc,
-        total_fees_amount_tax_inc: data.total_fees_amount,
-        total_refunds: data.total_refunds,
-        total_refunds_fees: data.total_refunds_fees,
-        seller: data.seller.data.name,
-        orders
-    }
+    
 }
 
 const headers = [
@@ -47,7 +59,7 @@ const headers = [
 
 const filename = 'reports.csv'
 
-const uri = '/v1/payments/reports?include=seller,order_sellers'
+const uri = '/v1/payments/reports?include=""'
 
 module.exports = {
     uri,

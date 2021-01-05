@@ -30,6 +30,13 @@ const detail = async product => {
         
         variants.forEach(variant => {
 
+            // get deepest category level's name
+            let categories
+            if (product.categories.data.length > 0) {
+                const categories_level_5 = product.categories.data.filter(category => category.level_depth === 5)
+                categories = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
+            } 
+
             const Product = {
                 id: product.id,
                 reference_product: product.reference,
@@ -41,7 +48,7 @@ const detail = async product => {
                 name: product.translations.data[0].name,
                 long_description: product.translations.data[0].description,
                 short_description: product.translations.data[0].description_short,
-                category: product.categories.data.length > 0 ? product.categories.data[0].translations.data[0].name : '',
+                category: categories,
                 reviews_amount: product.product_reviews.data.length,
                 url: product.url_front,
                 state: product.state,

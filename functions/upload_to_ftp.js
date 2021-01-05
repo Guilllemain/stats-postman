@@ -13,7 +13,7 @@ module.exports = async (models) => {
         })
         await client.ensureDir("stats")
         for (let i = 0; i < models.length; i++) {
-            await client.uploadFrom(`./${models[i].filename}`, models[i].filename)
+            await client.uploadFrom(`./stats/${models[i].filename}`, models[i].filename)
         }
     }
     catch (err) {
