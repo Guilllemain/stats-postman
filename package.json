@@ -16,6 +16,7 @@
     "start": "node app.js",
     "clean": "node cleanReport.js",
     "addReport": "node addOrdersReport.js",
+    "updateOffers": "node updateOffers.js",
     "updateOrigamiCatalog": "node ./functions/update_origami_vendor_catalog_offers.js"
   },
   "author": "",

@@ -24,7 +24,7 @@ const getData = async (data, page = 1) => {
 
         data.models.forEach(model => {
             createCsvWriter({
-                path: `./${model.filename}`,
+                path: `./stats/${model.filename}`,
                 fieldDelimiter: ';',
                 header: model.headers
             })

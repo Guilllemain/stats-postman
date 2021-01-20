@@ -32,7 +32,7 @@ const detail = offer => {
 
 const filename = 'offers.csv'
 
-const uri = '/v1/catalog/products/variants/offers'
+const uri = '/v1/catalog/products/variants/offers?include=""'
 
 module.exports = {
     uri,
