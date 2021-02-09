@@ -129,7 +129,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
         }
     }
     
-    createCvsOffers(products_not_in_catalog)
+    // createCvsOffers(products_not_in_catalog)
 }
 
 const all_offers = []
