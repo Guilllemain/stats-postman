@@ -14,7 +14,7 @@
     "nodemailer": "^6.4.3"
   },
   "scripts": {
-    "start": "node ./functions/update_origami_vendor_catalog_offers.js",
+    "start": "",
     "app": "node app.js",
     "clean": "node cleanReport.js",
     "addReport": "node addOrdersReport.js",
