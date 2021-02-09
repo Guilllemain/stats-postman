@@ -6,11 +6,7 @@ const updateProducts = async products => {
         const product = products[i]
         try {
             const response = await axios.patch(`${base_uri}/v1/catalog/products/${product}?context[user_group_id]=1`, {
-                additional_information: {
-                    on_sale: {
-                        value: 1
-                    }
-                }
+                "state_id": 4
             })
             console.log(response.status, ' ------ ', product)
             // const { data: { data: response } } = await axios.get(`${base_uri}/v1/catalog/products/${product.product_id}?context[user_group_id]=1&include=features`)

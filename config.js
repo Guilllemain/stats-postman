@@ -9,14 +9,11 @@ module.exports = {
     password: process.env.PASSWORD,
     client_id: process.env.CLIENT_ID,
     client_secret: process.env.CLIENT_SECRET,
-    sendgrid_user: process.env.SENDGRID_USER,
-    sendgrid_key: process.env.SENDGRID_KEY,
-    sendgrid_port: process.env.SENDGRID_PORT,
-    sendgrid_host: process.env.SENDGRID_HOST,
+    sendgrid_api_key: process.env.SENDGRID_API_KEY,
     mail_from: process.env.MAIL_FROM,
     mail_to: process.env.MAIL_TO,
     promotennis_url: process.env.PROMOTENNIS_URL,
     ftp_host: process.env.FTP_HOST,
     ftp_user: process.env.FTP_USER,
-    ftp_password: process.env.FTP_PASSWORD,
+    ftp_password: process.env.FTP_PASSWORD
 };

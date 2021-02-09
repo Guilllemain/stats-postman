@@ -1,10 +1,14 @@
 const { base_uri, promotennis_url } = require('../config');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const axios = require('axios');
 const getToken = require('./auth')
 
 const context = 'context[user_group_id]=1'
 
+const seller_id = 5604
 const fetched_offers = []
+const products_not_in_catalog = []
+
 const updateOrigamiVendorCatalog = async (page = 1) => {
     await getToken()
     console.log(page)
@@ -13,11 +17,12 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
         // get all active products with an image
         const active_products = products.filter(product => product.image_default)
         // remove Wilson products
-        const authorized_products = active_products.filter(product => !product.name.toLowerCase().includes('wilson') && !product.name.toLowerCase().includes('luxilon'))
+        const authorized_products = active_products.filter(product => !product.name.toLowerCase().includes('wilson') && !product.name.toLowerCase().includes('luxilon') && !product.name.toLowerCase().includes('nike'))
         // get all offers from the selected products
         const offers = authorized_products.map(product => {
             let ean = product.ean
-            if (product.ean && product.ean.length === 11) {
+            
+            if (product.ean && product.ean.length === 12) {
                 ean = 0 + product.ean
             }
 
@@ -32,7 +37,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                 }
             } else {
                 return Object.keys(product.variants).map(variant => {
-                    if (product.variants[variant].ean13 && product.variants[variant].ean13.length === 11) {
+                    if (product.variants[variant].ean13 && product.variants[variant].ean13.length === 12) {
                         ean = 0 + product.variants[variant].ean13
                     }
                     return {
@@ -57,17 +62,25 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
     }
 
     const updated_offers = fetched_offers.flat()
-    const catalog_offers = await getOffersCatalog(4219)
+    const catalog_offers = await getOffersCatalog(seller_id)
+
     
     // find all online offers that are not in the seller's catalog and desactive them
-    let offers_to_disable = catalog_offers.filter(o1 => !updated_offers.some(o2 => o1.reference_supplier === o2.reference_supplier))
-    
+    const offers_not_in_seller_catalog = catalog_offers.filter(o1 => !updated_offers.some(o2 => o1.reference_supplier === o2.reference_supplier))
+    const offers_to_disable = offers_not_in_seller_catalog.filter(offer => offer.quantity !== 0)
+    console.log(`${offers_to_disable.length} offers to disable`)
+
     if (offers_to_disable.length > 0) {
         for (let i = 0; i < offers_to_disable.length; i++) {
             const offer = offers_to_disable[i]
-            await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${offer.id}?${context}`, {
-                is_active: 0
-            })
+            try {
+                const response = await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${offer.id}?${context}`, {
+                    quantity: 0
+                })
+                console.log(`${response.status} --- offer ID ${offer.id} has been disabled`)
+            } catch(error) {
+                console.log(error)
+            }
         }
     }
 
@@ -88,37 +101,40 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                 } catch (error) {
                     console.log(error, ' | ', offer.reference_supplier, ' --- ERROR ---')
                 }
-            } else if (response.length === 0 && offer.ean) { 
+            } else if (response.length == 0 && offer.ean) { 
                 try {
                     const { data: { data: variant } } = await axios.get(`${base_uri}/v1/catalog/products/variants?filter[ean13]=${offer.ean}&${context}&include=product`)
                     if (variant.length > 0) {
                         const new_offer = await axios.post(`${base_uri}/v1/catalog/products/variants/offers?${context}`, {
                             product_id: variant[0].product_id,
                             product_variant_id: variant[0].id,
-                            seller_id: 4219,
+                            seller_id,
                             tax_id: 1,
                             reference_supplier: offer.reference_supplier,
                             price_tax_exc: offer.price_tax_exc,
                             quantity: offer.quantity
                         })
-                        console.log(new_offer.status, ' --- NEW OFFER --- ', offer.reference_supplier)
-                    } else if (variant.length === 0 && offer.ean) {
-                        console.log(`Product ${offer.reference_supplier} with ean ${offer.ean} does not appears to be in our catalog`)
+                        console.log(new_offer.status, ' --- NEW OFFER --- ', offer.reference_supplier, ' --- ', offer.ean)
+                    } else {
+                        products_not_in_catalog.push({product_id: offer.product_id, variant_id: offer.variant_id ? offer.variant_id : ''})
                     }
                 } catch (error) {
-                    console.log(error, '--- ERROR ---', offer.reference_supplier)
+                    console.log(error.data.errors, '--- ERROR ---', offer.reference_supplier)
                 }
+            } else if (response.length == 0) {
+                products_not_in_catalog.push({ product_id: offer.product_id, variant_id: offer.variant_id ? offer.variant_id : '' })
             }
         } catch (error) {
             console.log(error.status, ' | ', offer.reference_supplier, ' --- ERROR ---')
         }
     }
-
+    
+    createCvsOffers(products_not_in_catalog)
 }
 
+const all_offers = []
 const getOffersCatalog = async (seller_id, page = 1) => {
     console.log(page)
-    const all_offers = []
     const { data: { data: offers }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers?${context}&page=${page}&filter[seller_id]=${seller_id}`)
     all_offers.push(offers)
 
@@ -126,6 +142,20 @@ const getOffersCatalog = async (seller_id, page = 1) => {
         return getOffersCatalog(seller_id, pagination.pagination.current_page + 1)
     }
     return all_offers.flat()
+}
+
+
+const createCvsOffers = data => {
+    createCsvWriter({
+        path: `./stats/TB_offers_to_create.csv`,
+        fieldDelimiter: ';',
+        header: [
+            { id: 'product_id', title: 'Product ID' },
+            { id: 'variant_id', title: 'Variant ID' },
+        ]
+    })
+    .writeRecords(data)
+    .then(() => console.log(`The file was written successfully`));
 }
 
 

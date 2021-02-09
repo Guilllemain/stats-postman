@@ -45,6 +45,7 @@ const getData = async (data, page = 1) => {
 
     } catch (error) {
         console.error(error.response)
+        console.log(error.response.data.errors)
         if (error.response.status === 401) console.log('You need a new access token')
     }
 }
