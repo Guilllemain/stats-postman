@@ -20,7 +20,8 @@ const headers = [
     { id: 'url', title: 'Lien' },
     { id: 'state', title: 'Statut' },
     { id: 'meta_title', title: 'Meta title' },
-    { id: 'meta_description', title: 'Meta description' }
+    { id: 'meta_description', title: 'Meta description' },
+    { id: 'attribute_value_id', title: 'ID valeur attribut' }
 ]
 
 const detail = async product => {
@@ -63,6 +64,7 @@ const detail = async product => {
                     Object.defineProperty(Product, `attribute_${attribute.attribute_type_id}`, {
                         value: attribute.attribute_value.data.translations.data[0].name
                     });
+                    Product.attribute_value_id = attribute.attribute_value.data.id
                 })
             }
 

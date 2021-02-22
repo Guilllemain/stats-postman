@@ -21,11 +21,6 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
         // get all offers from the selected products
         const offers = authorized_products.map(product => {
             let ean = product.ean
-            
-            if (product.ean && product.ean.length === 12) {
-                ean = 0 + product.ean
-            }
-
             if (product.variants.length === 0) {
                 return {
                     product_id: product.id,
@@ -129,7 +124,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
         }
     }
     
-    // createCvsOffers(products_not_in_catalog)
+    createCvsOffers(products_not_in_catalog)
 }
 
 const all_offers = []
