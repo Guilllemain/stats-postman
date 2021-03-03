@@ -18,16 +18,16 @@ const getOrigamiVendorCatalog = require('./functions/get_origami_vendor_catalog'
 
 async function getFullStats() {
     await getToken()
-    // await getOrigamiVendorCatalog(Catalog)
+    await getOrigamiVendorCatalog(Catalog)
     // await getData(Feed)
-    await getData(Sellers)
-    await getData(Reviews)
-    await getData(Orders)
-    await getData(Products)
-    await getData(Offers)
-    await getData(Tickets)
-    await getData(Reports)
-    await getData(Customers)
+    // await getData(Sellers)
+    // await getData(Reviews)
+    // await getData(Orders)
+    // await getData(Products)
+    // await getData(Offers)
+    // await getData(Tickets)
+    // await getData(Reports)
+    // await getData(Customers)
 }
 
 getFullStats()

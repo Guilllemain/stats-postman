@@ -1,74 +1,8 @@
 const { base_uri } = require('../config');
 const axios = require('axios')
 const moment = require('moment')
-const getCategoryProducts = require('../functions/get_rackets_categories_products')
 
 moment.locale('fr')
-
-const detail = async product => {
-    try {
-        const products = []
-        const { data: { data: variants } } = await axios.get(`${base_uri}/v1/catalog/products/variants?context[user_group_id]=1&include=attributes&filter[product_id]=${product.id}`)
-        
-        variants.forEach(variant => {
-
-            // get deepest category level's name
-            let categories
-            if (product.categories.data.length > 0) {
-                const categories_level_5 = product.categories.data.filter(category => category.level_depth === 5)
-                categories = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
-            } 
-
-            const Product = {
-                id: product.id,
-                reference_product: product.reference,
-                variant_id: variant.id,
-                reference_variant: variant.reference,
-                ean: variant.ean13,
-                created_at: moment(product.created_at).format('L'),
-                updated_at: moment(product.updated_at).format('L'),
-                name: product.translations.data[0].name,
-                long_description: product.translations.data[0].description,
-                short_description: product.translations.data[0].description_short,
-                category: categories,
-                reviews_amount: product.product_reviews.data.length,
-                url: product.url_front,
-                state: product.state,
-                meta_title: product.translations.data[0].meta_title,
-                meta_description: product.translations.data[0].meta_description
-            }
-            if (variant.attributes.data.length > 0) {
-                variant.attributes.data.forEach((attribute) => {
-                    if (!headers.some(header => header.id === `attribute_${attribute.attribute_type_id}`)) {
-                        headers.push({ id: `attribute_${attribute.attribute_type_id}`, title: attribute.attribute_type.data.translations.data[0].name })
-                    }
-                    Object.defineProperty(Product, `attribute_${attribute.attribute_type_id}`, {
-                        value: attribute.attribute_value.data.translations.data[0].name
-                    });
-                    Product.attribute_value_id = attribute.attribute_value.data.id
-                })
-            }
-
-            if (product.features.data.length > 0) {
-                product.features.data.forEach((feature) => {
-                    if (!headers.some(header => header.id === `feature_${feature.feature_type.data.id}`)) {
-                        headers.push({ id: `feature_${feature.feature_type.data.id}`, title: feature.feature_type.data.translations.data[0].name })
-                    }
-                    Object.defineProperty(Product, `feature_${feature.feature_type.data.id}`, {
-                        value: feature.translations.data[0].value
-                    });
-                })
-            }
-            products.push(Product)
-        })
-        
-        return products
-
-    } catch (error) {
-        console.log(error)
-        console.log(error.code)
-    }
-};
 
 const headers = [
     { id: 'id', title: 'ID' },
@@ -90,66 +24,76 @@ const headers = [
     { id: 'attribute_value_id', title: 'ID valeur attribut' }
 ]
 
-const filename = 'products.csv'
+const getProducts = async (product, category_data) => {
+    try {
+        const products = []
+        if (product.categories.data.length === 0) return
+        if (!product.categories.data.some(cat => cat.id === category_data.category_id)) return
+        const { data: { data: variants } } = await axios.get(`${base_uri}/v1/catalog/products/variants?context[user_group_id]=1&include=attributes&filter[product_id]=${product.id}`)
 
-const uri = '/v1/catalog/products?include=categories,features.feature_type,product_reviews'
+        variants.forEach(variant => {
 
+            // get deepest category level's name
+            let categories
+            if (product.categories.data.length > 0) {
+                const categories_level_5 = product.categories.data.filter(category => category.level_depth === 5)
+                categories = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
+            }
 
-//products categories
-const rackets = {
-    filename: 'raquettes.csv',
-    category_id: 5,
-    attributes_id: [3, 7],
-    features_id: [40, 60, 35, 73, 37, 47, 54, 41, 42, 47],
-    products: []
-}
-const balls = {
-    filename: 'balles.csv',
-    category_id: 10,
-    attributes_id: "",
-    features_id: [25, 5, 26],
-    products: []
-}
+            const Product = {
+                id: product.id,
+                reference_product: product.reference,
+                variant_id: variant.id,
+                reference_variant: variant.reference,
+                ean: variant.ean13,
+                created_at: moment(product.created_at).format('L'),
+                updated_at: moment(product.updated_at).format('L'),
+                name: product.translations.data[0].name,
+                long_description: product.translations.data[0].description,
+                short_description: product.translations.data[0].description_short,
+                category: categories,
+                reviews_amount: product.product_reviews.data.length,
+                url: product.url_front,
+                state: product.state,
+                meta_title: product.translations.data[0].meta_title,
+                meta_description: product.translations.data[0].meta_description
+            }
+            if (variant.attributes.data.length > 0) {
+                variant.attributes.data.forEach((attribute) => {
+                    if (!category_data.attributes_id || !category_data.attributes_id.some(attr => attr === attribute.attribute_type_id)) return
+                    if (!headers.some(header => header.id === `attribute_${attribute.attribute_type_id}`)) {
+                        headers.push({ id: `attribute_${attribute.attribute_type_id}`, title: attribute.attribute_type.data.translations.data[0].name })
+                    }
+                    Object.defineProperty(Product, `attribute_${attribute.attribute_type_id}`, {
+                        value: attribute.attribute_value.data.translations.data[0].name
+                    });
+                    Product.attribute_value_id = attribute.attribute_value.data.id
+                })
+            }
 
-// const racket_detail = async(product) => {
-//     const rackets_products = []
-//     const racket_product = await getCategoryProducts.getProducts(product, rackets)
-//     if (racket_product) {
-//         racket_product.forEach(racket => rackets_products.push(racket))
-//     }
-//     return rackets_products
-// }
+            if (product.features.data.length > 0) {
+                product.features.data.forEach((feature) => {
+                    if (!category_data.features_id.some(feat => feat === feature.feature_type_id)) return
+                    if (!headers.some(header => header.id === `feature_${feature.feature_type.data.id}`)) {
+                        headers.push({ id: `feature_${feature.feature_type.data.id}`, title: feature.feature_type.data.translations.data[0].name })
+                    }
+                    Object.defineProperty(Product, `feature_${feature.feature_type.data.id}`, {
+                        value: feature.translations.data[0].value
+                    });
+                })
+            }
+            products.push(Product)
+        })
+        return products
 
-// const ball_detail = async(product) => {
-//     const balls_products = []
-//     const ball_product = await getCategoryProducts.getProducts(product, balls)
-//     if (ball_product) {
-//         ball_product.forEach(ball => balls_products.push(ball))
-//     }
-//     console.log(getCategoryProducts.headers)
-//     return balls_products
-// }
+    } catch (error) {
+        console.log(error)
+        console.log(error.code)
+    }
+};
+
 
 module.exports = {
-    uri,
-    models: [
-        {
-            detail,
-            headers,
-            filename,
-            final_data: []
-        }
-        // {
-        //     detail: racket_detail,
-        //     headers: getCategoryProducts.headers,
-        //     filename: rackets.filename,
-        //     final_data: []
-        // },
-        // {
-        //     detail: ball_detail,
-        //     headers: getCategoryProducts.headers,
-        //     filename: balls.filename,
-        //     final_data: []
-        // }
-    ]
+    getProducts,
+    headers
 }

@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { promotennis_url } = require('../config');
+const { promotennis_url, extreme_tennis_url } = require('../config');
 
 moment.locale('fr')
 

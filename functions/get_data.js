@@ -11,7 +11,9 @@ const extractDataFromResponse = async (response, data_type, final_data) => {
     for (let i = 0; i < response.length; i++) {
         try {
             product = await data_type(response[i])
-            final_data.push(product)
+            if (product) {
+                final_data.push(product)
+            }
         } catch(error) {
             console.log(error)
         }
@@ -30,7 +32,6 @@ const getData = async (data, page = 1) => {
         if (pagination.pagination.current_page < pagination.pagination.total_pages) {
             return await getData(data, pagination.pagination.current_page + 1)
         }
-        
         data.models.forEach(model => {
             createCsvWriter({
                 path: `./stats/${model.filename}`,
@@ -44,7 +45,7 @@ const getData = async (data, page = 1) => {
         uploadToFtp(data.models)
 
     } catch (error) {
-        console.error(error.response)
+        console.error(error.status)
         console.log(error.response.data.errors)
         if (error.response.status === 401) console.log('You need a new access token')
     }

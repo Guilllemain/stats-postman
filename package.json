@@ -18,7 +18,8 @@
     "clean": "node cleanReport.js",
     "addReport": "node addOrdersReport.js",
     "updateOffers": "node updateOffers.js",
-    "updateOrigamiCatalog": "node ./functions/update_origami_vendor_catalog_offers.js"
+    "updateOrigamiCatalog": "node ./functions/update_origami_vendor_catalog_offers.js",
+    "updateQuotes": "node ./functions/update_quotes.js"
   },
   "author": "",
   "license": "ISC"
