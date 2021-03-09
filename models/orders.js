@@ -51,7 +51,7 @@ const orders_headers = [
 
 const orders_filename = 'orders.csv'
 
-const uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,payment_transactions,customer&order[name]=id&order[way]=desc'
+const uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,payment_transactions,customer&order[name]=id&order[way]=desc&filter[type]=quote&filter[type]=order'
 
 
 // order lines file

@@ -13,11 +13,15 @@ const detail = async product => {
         variants.forEach(variant => {
 
             // get deepest category level's name
-            let categories
+            let categories_name, categories_id, default_category
             if (product.categories.data.length > 0) {
                 const categories_level_5 = product.categories.data.filter(category => category.level_depth === 5)
-                categories = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
-            } 
+                categories_name = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
+                categories_id = categories_level_5.map(category => category.id).join(' / ')
+            }
+            if (product.default_category_id) {
+                default_category = product.categories.data.find(cat => cat.id === product.default_category_id).translations.data[0].name
+            }
 
             const Product = {
                 id: product.id,
@@ -30,7 +34,9 @@ const detail = async product => {
                 name: product.translations.data[0].name,
                 long_description: product.translations.data[0].description,
                 short_description: product.translations.data[0].description_short,
-                category: categories,
+                default_category,
+                categories_name,
+                categories_id,
                 reviews_amount: product.product_reviews.data.length,
                 url: product.url_front,
                 state: product.state,
@@ -81,7 +87,9 @@ const headers = [
     { id: 'name', title: 'Nom' },
     { id: 'long_description', title: 'Description longue' },
     { id: 'short_description', title: 'Description courte' },
-    { id: 'category', title: 'Categorie' },
+    { id: 'default_category', title: 'Categorie principale' },
+    { id: 'categories_name', title: 'Categories' },
+    { id: 'categories_id', title: 'ID categories' },
     { id: 'reviews_amount', title: 'Nombre avis' },
     { id: 'url', title: 'Lien' },
     { id: 'state', title: 'Statut' },

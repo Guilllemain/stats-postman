@@ -5,11 +5,12 @@ const { base_uri } = require('../config');
 const getToken = require('./auth')
 
 // global variables
-const states_id = [43, 45] //staging
-// const states_id = [36, 39] //prod
-// const state_validated_by_seller_id = 37 // prod
-const state_validated_by_seller_id = 43 // staging
-const state_cancel_quote_id = 50 // staging
+// const states_id = [43, 45] //staging
+const states_id = [36, 38, 39] // PROD
+// const state_validated_by_seller_id = 43 // staging
+const state_validated_by_seller_id = 36 // PROD
+// const state_expire_quote_id = 50 // staging
+const state_expire_quote_id = 45 // PROD
 
 const updateQuotes = async (page = 1) => {
     await getToken()
@@ -33,19 +34,17 @@ const updateQuotes = async (page = 1) => {
                     try {
                         const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`,
                         {
-                            state_id: state_cancel_quote_id
+                            state_id: state_expire_quote_id
                         })
-                        console.log(response.status, ' ----- OUTDATED ----- ', quote.id)
+                        console.log(response.status, ` ----- quote ${quote.id} expired -----  `)
                     } catch(error) {
-                        console.log(error.response.data, ' ----- ERROR ----- ', quote.id)
+                        console.log(error.response.data, ' ----- ERROR EXPIRE----- ', quote.id)
                     }
                 }
 
                 // send notification if half of the validity date has passed
-                console.log(moment(moment(validated_at).add(validity_date / 2, 'days')))
-                console.log(quote.id)
                 if (!quote_notifications && moment(moment(validated_at).add(validity_date / 2, 'days')).isBefore()) {
-                    console.log(quote.id)
+                    // console.log(quote.id)
                     // try {
                     //     const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
                     //         additional_information: {
