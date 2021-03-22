@@ -6,13 +6,13 @@ const getToken = require('./auth')
 
 // global variables
 // const states_id = [43, 45] //staging
-const states_id = [36, 38, 39] // PROD
+const states_id = [36, 39] // PROD
 // const state_validated_by_seller_id = 43 // staging
 const state_validated_by_seller_id = 36 // PROD
 // const state_expire_quote_id = 50 // staging
 const state_expire_quote_id = 45 // PROD
 
-const updateQuotes = async (page = 1) => {
+const updateQuotes = async (page = 8) => {
     await getToken()
     try {
         console.log(page)
@@ -30,6 +30,9 @@ const updateQuotes = async (page = 1) => {
             // cancel quote if validity date has passed
             if (validated_at && validity_date) {
                 const quote_notifications = quote.additional_information.quote_notifications.value
+                const first_notification_date = validity_date / 2
+                const second_notification_date = validity_date - 3
+                
                 if (moment(moment(validated_at).add(validity_date, 'days')).isBefore()) {
                     try {
                         const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`,
@@ -43,34 +46,46 @@ const updateQuotes = async (page = 1) => {
                 }
 
                 // send notification if half of the validity date has passed
-                if (!quote_notifications && moment(moment(validated_at).add(validity_date / 2, 'days')).isBefore()) {
-                    // console.log(quote.id)
-                    // try {
-                    //     const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
-                    //         additional_information: {
-                    //             quote_notifications: '1/2'
-                    //         }
-                    //     })
-                    //     console.log(response.status, ' ----- FIRST NOTIFICATION ----- ', quote.id)
-                    // } catch (error) {
-                    //     console.log(error, ' ----- ERROR ----- ', quote.id)
-                    // }
+                if (quote.state_id === state_validated_by_seller_id && !quote_notifications && moment(moment(validated_at).add(first_notification_date, 'days')).isBefore() && moment(moment(validated_at).add(second_notification_date, 'days')).isAfter()) {
+                    // initializing custom field
+                    try {
+                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                            additional_information: {
+                                quote_notifications: '1'
+                            }
+                        })
+                        console.log(response.status, ' ----- INITIALIZE CUSTOM FIELD ----- ', quote.id)
+                    } catch (error) {
+                        console.log(error, ' ----- ERROR ----- ', quote.id)
+                    }
+                    // set custom field value
+                    try {
+                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                            additional_information: {
+                                quote_notifications: '1/2'
+                            }
+                        })
+                        console.log(response.status, ' ----- FIRST NOTIFICATION ----- ', quote.id)
+                    } catch (error) {
+                        console.log(error, ' ----- ERROR ----- ', quote.id)
+                    }
                 }
 
+                
+
                 // send another notification 72h before expiration
-                // const get_notifiable_time = moment(validated_at).subtract(72, 'hours')
-                // if (quote_notifications == '1/2' && moment(moment(validated_at).add(get_notifiable_time, 'days')).isBefore()) {
-                    // try {
-                    //     const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
-                    //         additional_information: {
-                    //             quote_notifications: '2/2'
-                    //         }
-                    //     })
-                    //     console.log(response.status, ' ----- FIRST NOTIFICATION ----- ', quote.id)
-                    // } catch (error) {
-                    //     console.log(error, ' ----- ERROR ----- ', quote.id)
-                    // }
-                // }
+                if (second_notification_date > 0 && quote_notifications == '1/2' && moment(moment(validated_at).add(second_notification_date, 'days')).isBefore()) {
+                    try {
+                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                            additional_information: {
+                                quote_notifications: '2/2'
+                            }
+                        })
+                        console.log(response.status, ' ----- SECOND NOTIFICATION ----- ', quote.id)
+                    } catch (error) {
+                        console.log(error, ' ----- ERROR ----- ', quote.id)
+                    }
+                }
             }
         }
         if (pagination.pagination.current_page <= pagination.pagination.total_pages) {
