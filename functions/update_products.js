@@ -5,10 +5,10 @@ const updateProducts = async products => {
     for (let i = 0; i < products.length; i++) {
         const product = products[i]
         try {
-            const response = await axios.patch(`${base_uri}/v1/catalog/products/${product}?context[user_group_id]=1`, {
-                "state_id": 4
+            const response = await axios.patch(`${base_uri}/v1/catalog/products/${product.product_id}?context[user_group_id]=1`, {
+                default_category_id: product.category_id
             })
-            console.log(response.status, ' ------ ', product)
+            console.log(response.status, ' ------ ', product.product_id)
             // const { data: { data: response } } = await axios.get(`${base_uri}/v1/catalog/products/${product.product_id}?context[user_group_id]=1&include=features`)
             // const features = response.features.data.map(feature => {
             //     return {
@@ -31,7 +31,7 @@ const updateProducts = async products => {
             //     console.log(error.status)
             // }
         } catch (error) {
-            console.log(error.status, ' ----- ERROR ----- ', product)
+            console.log(error.status, ' ----- ERROR ----- ', product.product_id)
         }
     }
 }

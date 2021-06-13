@@ -14,7 +14,7 @@ const headers = [
 
 const filename = 'categories.csv'
 
-const uri = '/v1/categories?include=""'
+const uri = '/v1/catalog/categories?include=""'
 
 module.exports = {
     uri,

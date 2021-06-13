@@ -1,16 +1,16 @@
 // remove all orders from an open payment report
 const axios = require('axios');
 const { base_uri } = require('../config');
-const {create_specific_price, add_specific_price} = require('./specific_price')
+const {create_specific_price, add_specific_price, delete_specific_price} = require('./specific_price')
 
 module.exports = async (offers) => {
     for (let i = 0; i < offers.length; i++) {
         const offer = offers[i]
-        try {
-            const response = await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${offer}?context[user_group_id]=1`, {
-                is_active: false
-            })
-            console.log(response.status, ' | ', offer)
+        // try {
+        //     const response = await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${offer}?context[user_group_id]=1`, {
+        //         is_active: false
+        //     })
+        //     console.log(response.status, ' | ', offer)
             // const { data : { data : response} } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers/${offer}?context[user_group_id]=1`)
             // if (response.seller_id !== 2717) return
             // const { data: { data: variant } } = await axios.get(`${base_uri}/v1/catalog/products/variants/${response.product_variant_id}?context[user_group_id]=1&include=offers,product`)
@@ -29,11 +29,13 @@ module.exports = async (offers) => {
             //     await axios.delete(`${base_uri}/v1/catalog/products/variants/offers/${offer}?context[user_group_id]=1`)
             // }
             
-        } catch (error) {
-            console.log(error.response.status, offer, ' --- ERROR ---')
-        }
+        // } catch (error) {
+        //     console.log(error.response.status, offer, ' --- ERROR ---')
+        // }
         
         // add specific price rules
         // await add_specific_price(offer, 65777)
+        // delete specific price rules
+        await delete_specific_price(offer, 65777)
     }
 }

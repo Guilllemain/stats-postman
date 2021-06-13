@@ -4,6 +4,7 @@ moment.locale('fr')
 
 // orders file
 const orders_detail = data => {
+    if (data.type === 'cart') return
     return {
         id: data.id,
         reference: data.reference,
@@ -14,7 +15,7 @@ const orders_detail = data => {
         total: data.total_tax_inc,
         total_products: data.total_products_tax_inc,
         total_shipping: data.total_shipping_tax_inc,
-        commission: data.fees_amount_tax_inc,
+        commission: data.seller_fees_amount_tax_inc,
         product_lines_count: data.orderLines.data.length,
         tracking_link: data.tracking_number ? data.url_tracking + data.tracking_number : '',
         customer_name: data.customer.data.name,
@@ -51,11 +52,12 @@ const orders_headers = [
 
 const orders_filename = 'orders.csv'
 
-const uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,payment_transactions,customer&order[name]=id&order[way]=desc&filter[type]=quote&filter[type]=order'
+const uri = '/v1/orders?include=orderLines,seller,shippingOffer.shipping_type,state,payment_transactions,customer&order[name]=id&order[way]=desc'
 
 
 // order lines file
 const order_lines_detail = data => {
+    if (data.type === 'cart') return
     const product_lines = []
     data.orderLines.data.forEach(line => {
         product_lines.push({

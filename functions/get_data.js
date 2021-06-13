@@ -23,13 +23,12 @@ const getData = async (data, page = 1) => {
     try {
         console.log(`<------------- PAGE NUMBER ${page} ---------------->`)
         const { data: { data: raw_response }, data: { meta: pagination } } = await axios.get(`${base_uri}${data.uri}&context[user_group_id]=1&page=${page}`)
-        
         // loop through models to extract data
         for (let i = 0; i < data.models.length; i++) {
             await extractDataFromResponse(raw_response, data.models[i].detail, data.models[i].final_data)
         }
         
-        if (pagination.pagination.current_page < pagination.pagination.total_pages) {
+        if (pagination && pagination.pagination.current_page < pagination.pagination.total_pages) {
             return await getData(data, pagination.pagination.current_page + 1)
         }
         data.models.forEach(model => {
@@ -45,7 +44,7 @@ const getData = async (data, page = 1) => {
         uploadToFtp(data.models)
 
     } catch (error) {
-        console.error(error.status)
+        console.error(error.response)
         console.log(error.response.data.errors)
         if (error.response.status === 401) console.log('You need a new access token')
     }

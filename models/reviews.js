@@ -2,6 +2,10 @@ const moment = require('moment')
 moment.locale('fr')
 
 const detail = data => {
+    let name = 'Produit supprimé'
+    if (data.recipient) {
+        name = data.recipient_type === "seller" ? data.recipient.data.name : data.recipient.data.translations.data[0].name
+    } 
     return {
         review_id: data.id,
         rating: data.rating,
@@ -9,7 +13,7 @@ const detail = data => {
         created_at: moment(data.created_at).format('L'),
         recipient_type: data.recipient_type,
         recipient_id: data.recipient_id,
-        name: data.recipient_type === "seller" ? data.recipient.data.name : data.recipient.data.translations.data[0].name,
+        name,
         order_id: data.order_seller_id,
         customer_id: data.author_id
     }
