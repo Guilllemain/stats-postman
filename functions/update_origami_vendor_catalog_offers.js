@@ -12,7 +12,7 @@ const products_not_in_catalog = []
 
 const updateOrigamiVendorCatalog = async (page = 1) => {
     await getToken()
-    console.log(page)
+    console.log(`--- PAGE ${page} ---`)
     try {
         const { data: { products }, data: { pagination } } = await axios.get(`${promotennis_url}&page=${page}`)
         // get all active products with an image
@@ -36,9 +36,11 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                 }
             } else { 
                 return Object.keys(product.variants).map(variant => {
+                    // console.log(product.variants[variant])
                     const discount_value = ((product.variants[variant].old_price_tax_inc - product.variants[variant].price_tax_inc) / product.variants[variant].old_price_tax_inc) * 100
-                    if (product.variants[variant].ean13 && product.variants[variant].ean13.length === 12) {
-                        ean = 0 + product.variants[variant].ean13
+                    ean = product.variants[variant].ean13
+                    if (product.variants[variant].ean13 && product.variants[variant].ean13.length !== 13) {
+                        ean = buildFullEan(product.variants[variant].ean13)
                     }
                     return {
                         product_id: product.id,
@@ -66,19 +68,17 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
     const catalog_offers = await getOffersCatalog(seller_id)
 
     
-    // find all online offers that are not in the seller's catalog and desactive them
-    const offers_not_in_seller_catalog = catalog_offers.filter(o1 => !updated_offers.some(o2 => o1.reference_supplier === o2.reference_supplier))
-    const offers_to_disable = offers_not_in_seller_catalog.filter(offer => offer.quantity !== 0)
-    console.log(`${offers_to_disable.length} offers to disable`)
+    // find all online offers that are not in the seller's catalog and delete them
+    const offers_not_in_seller_catalog = catalog_offers.filter(old_offer => !updated_offers.some(new_offer => old_offer.reference_supplier === new_offer.reference_supplier))
+    // const offers_to_disable = offers_not_in_seller_catalog.filter(offer => offer.quantity !== 0)
+    console.log(`${offers_not_in_seller_catalog.length} offers to delete`)
 
-    if (offers_to_disable.length > 0) {
-        for (let i = 0; i < offers_to_disable.length; i++) {
-            const offer = offers_to_disable[i]
+    if (offers_not_in_seller_catalog.length > 0) {
+        for (let i = 0; i < offers_not_in_seller_catalog.length; i++) {
+            const offer = offers_not_in_seller_catalog[i]
             try {
-                const response = await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${offer.id}?${context}`, {
-                    quantity: 0
-                })
-                console.log(`${response.status} --- offer ID ${offer.id} has been disabled`)
+                const response = await axios.delete(`${base_uri}/v1/catalog/products/variants/offers/${offer.id}?${context}`);
+                console.log(`${response.status} --- offer ID ${offer.id} has been deleted`);
             } catch(error) {
                 console.log(error)
             }
@@ -91,7 +91,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
         try {
             const { data: { data: response } } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers?filter[reference_supplier]=${offer.reference_supplier}&${context}&include=specific_price_rules`)
             // if there is a match and the offer has changed, update it
-            if ((response && response.length == 1) && (offer.quantity !== response[0].quantity || offer.old_price_tax_exc != response[0].price_tax_exc || offer.price_tax_inc != response[0].price_tax_inc_with_discount)) {
+            if ((response && response.length == 1) && (offer.quantity !== response[0].quantity || Number(offer.old_price_tax_exc) !== Number(response[0].price_tax_exc))) {
                 try {
                     const patch_offer = await axios.patch(`${base_uri}/v1/catalog/products/variants/offers/${response[0].id}?${context}`, {
                         price_tax_exc: offer.old_price_tax_exc,
@@ -115,7 +115,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                 } catch (error) {
                     console.log(error, ' | ', offer.reference_supplier, ' --- ERROR ---')
                 }
-            } else if (response.length === 0 && offer.ean) { 
+            } else if (response.length === 0 && offer.ean) {
                 try {
                     const { data: { data: variant } } = await axios.get(`${base_uri}/v1/catalog/products/variants?filter[ean13]=${offer.ean}&${context}&include=product`)
                     if (variant.length > 0) {
@@ -128,7 +128,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                             price_tax_exc: offer.price_tax_exc,
                             quantity: offer.quantity
                         })
-                        console.log(new_offer, ' --- NEW OFFER --- ', offer.reference_supplier, ' --- ', offer.ean)
+                        console.log(`ID ${new_offer.id} | ${offer.reference_supplier} | ${offer.ean} --- NEW OFFER ---`)
                         
                         // add specific price rules on the offer if the is a discount applied
                         if (offer.discount_value > 0) {
@@ -152,9 +152,16 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
     createCvsOffers(products_not_in_catalog)
 }
 
+const buildFullEan = ean => {
+    do {
+        ean = '0' + ean
+    } while (ean.length < 13);
+    return ean;
+}
+
 const all_offers = []
 const getOffersCatalog = async (seller_id, page = 1) => {
-    console.log(page)
+    console.log(`--- PAGE ${page} ---`)
     const { data: { data: offers }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/catalog/products/variants/offers?${context}&page=${page}&filter[seller_id]=${seller_id}`)
     all_offers.push(offers)
 
