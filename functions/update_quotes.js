@@ -1,4 +1,3 @@
-// remove all orders from an open payment report
 const axios = require('axios');
 const moment = require('moment')
 const { base_uri } = require('../config');
@@ -12,11 +11,11 @@ const state_validated_by_seller_id = 36 // PROD
 // const state_expire_quote_id = 50 // staging
 const state_expire_quote_id = 45 // PROD
 
-const updateQuotes = async (page = 8) => {
+const updateQuotes = async (page = 17) => {
     await getToken()
     try {
         console.log(page)
-        const { data: { data: quotes }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/orders?context[user_group_id]=1&filter[type]=quote&include=state_logs&page=${page}`)
+        const { data: { data: quotes }, data: { meta: pagination } } = await axios.get(`${base_uri}/v1/quotes?context[user_group_id]=1&include=state_logs&page=${page}`)
         const filtered_quotes = quotes.filter(quote => {
             return states_id.some(id => id === quote.state_id)
         })
@@ -35,13 +34,13 @@ const updateQuotes = async (page = 8) => {
                 
                 if (moment(moment(validated_at).add(validity_date, 'days')).isBefore()) {
                     try {
-                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`,
+                        const response = await axios.patch(`${base_uri}/v1/quotes/${quote.id}?context[user_group_id]=1`,
                         {
                             state_id: state_expire_quote_id
                         })
                         console.log(response.status, ` ----- quote ${quote.id} expired -----  `)
                     } catch(error) {
-                        console.log(error.response.data, ' ----- ERROR EXPIRE----- ', quote.id)
+                        console.log(error.response.data, ' ----- ERROR EXPIRE ----- ', quote.id)
                     }
                 }
 
@@ -49,7 +48,7 @@ const updateQuotes = async (page = 8) => {
                 if (quote.state_id === state_validated_by_seller_id && !quote_notifications && moment(moment(validated_at).add(first_notification_date, 'days')).isBefore() && moment(moment(validated_at).add(second_notification_date, 'days')).isAfter()) {
                     // initializing custom field
                     try {
-                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                        const response = await axios.patch(`${base_uri}/v1/quote_sellers/${quote.id}?context[user_group_id]=1`, {
                             additional_information: {
                                 quote_notifications: '1'
                             }
@@ -60,7 +59,7 @@ const updateQuotes = async (page = 8) => {
                     }
                     // set custom field value
                     try {
-                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                        const response = await axios.patch(`${base_uri}/v1/quote_sellers/${quote.id}?context[user_group_id]=1`, {
                             additional_information: {
                                 quote_notifications: '1/2'
                             }
@@ -76,7 +75,7 @@ const updateQuotes = async (page = 8) => {
                 // send another notification 72h before expiration
                 if (second_notification_date > 0 && quote_notifications == '1/2' && moment(moment(validated_at).add(second_notification_date, 'days')).isBefore()) {
                     try {
-                        const response = await axios.patch(`${base_uri}/v1/orders/${quote.id}?context[user_group_id]=1`, {
+                        const response = await axios.patch(`${base_uri}/v1/quote_sellers/${quote.id}?context[user_group_id]=1`, {
                             additional_information: {
                                 quote_notifications: '2/2'
                             }
