@@ -23,6 +23,7 @@ const uri = '/v1/orders?include=state_logs'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

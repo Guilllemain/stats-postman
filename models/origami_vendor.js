@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { promotennis_url, extreme_tennis_url } = require('../config');
+const { casalUrl, HlSportUrl, extremeTennisUrl, tennisCompagnie } = require('../config');
 
 moment.locale('fr')
 
@@ -133,7 +133,7 @@ const detail = product => {
 const filename = 'origami_vendor.csv'
 
 module.exports = {
-    uri: promotennis_url,
+    uri: casalUrl,
     models: [
         {
             detail,

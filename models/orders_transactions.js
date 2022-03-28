@@ -54,6 +54,7 @@ const uri = '/v1/orders?include=payment_transactions.parent&order[name]=id&order
 
 module.exports = {
     uri,
+    page_size: 500,
     models: [
         {
             detail,

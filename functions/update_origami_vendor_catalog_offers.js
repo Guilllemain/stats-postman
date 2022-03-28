@@ -1,4 +1,4 @@
-const { base_uri, promotennis_url } = require('../config');
+const { base_uri, promotennisUrl } = require('../config');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const axios = require('axios');
 const getToken = require('./auth')
@@ -14,7 +14,7 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
     await getToken()
     console.log(`--- PAGE ${page} ---`)
     try {
-        const { data: { products }, data: { pagination } } = await axios.get(`${promotennis_url}&page=${page}`)
+        const { data: { products }, data: { pagination } } = await axios.get(`${promotennisUrl}&page=${page}`)
         // get all active products with an image
         const active_products = products.filter(product => product.image_default)
         // remove Wilson products
@@ -119,21 +119,25 @@ const updateOrigamiVendorCatalog = async (page = 1) => {
                 try {
                     const { data: { data: variant } } = await axios.get(`${base_uri}/v1/catalog/products/variants?filter[ean13]=${offer.ean}&${context}&include=product`)
                     if (variant.length > 0) {
-                        const { data: { data: new_offer } } = await axios.post(`${base_uri}/v1/catalog/products/variants/offers?${context}`, {
-                            product_id: variant[0].product_id,
-                            product_variant_id: variant[0].id,
-                            seller_id,
-                            tax_id: 1,
-                            reference_supplier: offer.reference_supplier,
-                            price_tax_exc: offer.price_tax_exc,
-                            quantity: offer.quantity
-                        })
-                        console.log(`ID ${new_offer.id} | ${offer.reference_supplier} | ${offer.ean} --- NEW OFFER ---`)
-                        
-                        // add specific price rules on the offer if the is a discount applied
-                        if (offer.discount_value > 0) {
-                            const rule_id = await create_specific_price(offer.discount_value)
-                            await add_specific_price(new_offer.id, rule_id)
+                        try {
+                            const { data: { data: new_offer } } = await axios.post(`${base_uri}/v1/catalog/products/variants/offers?${context}`, {
+                                product_id: variant[0].product_id,
+                                product_variant_id: variant[0].id,
+                                seller_id,
+                                tax_id: 1,
+                                reference_supplier: offer.reference_supplier,
+                                price_tax_exc: offer.price_tax_exc,
+                                quantity: offer.quantity
+                            })
+                            console.log(`ID ${new_offer.id} | ${offer.reference_supplier} | ${offer.ean} --- NEW OFFER ---`)
+                            
+                            // add specific price rules on the offer if the is a discount applied
+                            if (offer.discount_value > 0) {
+                                const rule_id = await create_specific_price(offer.discount_value)
+                                await add_specific_price(new_offer.id, rule_id)
+                            }
+                        } catch (error) {
+                            console.log(error?.response?.data?.errors ?? error.response, '--- ERROR CREATING NEW OFFER ---', offer.reference_supplier)
                         }
                     } else {
                         products_not_in_catalog.push({product_id: offer.product_id, variant_id: offer.variant_id ? offer.variant_id : ''})

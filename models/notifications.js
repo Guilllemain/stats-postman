@@ -28,6 +28,7 @@ const uri = '/v1/notifications/logs?filter[type]=mail'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

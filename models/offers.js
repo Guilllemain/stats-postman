@@ -14,20 +14,20 @@ const headers = [
 ]
 
 const detail = offer => {
-        return {
-            id: offer.id,
-            seller_id: offer.seller_id,
-            product_id: offer.product_id,
-            product_variant_id: offer.product_variant_id,
-            reference_supplier: offer.reference_supplier,
-            quantity: offer.quantity,
-            price_tax_exc: offer.price_tax_exc,
-            price_tax_inc: offer.price_tax_inc,
-            price_tax_exc_with_discount: offer.price_tax_exc_with_discount,
-            price_tax_inc_with_discount: offer.price_tax_inc_with_discount,
-            minimal_quantity: offer.minimal_quantity,
-            is_active: offer.is_active === 1 ? 'Oui' : 'Non'
-        }
+    return {
+        id: offer.id,
+        seller_id: offer.seller_id,
+        product_id: offer.product_id,
+        product_variant_id: offer.product_variant_id,
+        reference_supplier: offer.reference_supplier,
+        quantity: offer.quantity,
+        price_tax_exc: offer.price_tax_exc,
+        price_tax_inc: offer.price_tax_inc,
+        price_tax_exc_with_discount: offer.price_tax_exc_with_discount,
+        price_tax_inc_with_discount: offer.price_tax_inc_with_discount,
+        minimal_quantity: offer.minimal_quantity,
+        is_active: offer.is_active === 1 ? 'Oui' : 'Non'
+    }
 };
 
 const filename = 'offers.csv'
@@ -36,6 +36,7 @@ const uri = '/v1/catalog/products/variants/offers?include=""'
 
 module.exports = {
     uri,
+    page_size: 200,
     models: [
         {
             detail,

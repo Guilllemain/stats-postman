@@ -28,6 +28,7 @@ const uri = '/v1/customers?include=order_sellers,custom_field_values.value'
 
 module.exports = {
     uri,
+    page_size: 500,
     models: [
         {
             detail,

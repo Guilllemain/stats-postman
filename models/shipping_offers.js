@@ -32,6 +32,7 @@ const uri = '/v1/shipping/offers?include=""'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

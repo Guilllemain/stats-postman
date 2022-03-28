@@ -37,6 +37,7 @@ const uri = '/v1/reviews?include=recipient'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

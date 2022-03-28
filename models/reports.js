@@ -63,6 +63,7 @@ const uri = '/v1/payments/reports?include=""'
 
 module.exports = {
     uri,
+    page_size: 100,
     models: [
         {
             detail,

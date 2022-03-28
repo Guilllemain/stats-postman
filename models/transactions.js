@@ -4,10 +4,12 @@ moment.locale('fr')
 
 const detail = data => {
     if (data.parent || data.psp !== 'hipay') return
+    
     let order
     if (data.orders && data.orders.data.length > 0) {
         order = data.orders.data[0].id
     }
+    
     return {
         id: data.id,
         type: data.type,
@@ -35,6 +37,7 @@ const uri = '/v1/payments/transactions?include=parent,orders'
 
 module.exports = {
     uri,
+    page_size: 500,
     models: [
         {
             detail,

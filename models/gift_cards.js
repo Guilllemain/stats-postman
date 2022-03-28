@@ -26,6 +26,7 @@ const uri = '/v1/gift_cards?include=order_seller.customer'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

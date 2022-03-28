@@ -30,6 +30,7 @@ const uri = '/v1/users?include=""'
 
 module.exports = {
     uri,
+    page_size: 1000,
     models: [
         {
             detail,

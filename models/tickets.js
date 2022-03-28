@@ -3,30 +3,27 @@ const moment = require('moment')
 moment.locale('fr')
 
 const detail = data => {
-    const lines = []
-    const tags = []
+    // get all tags linked to the ticket
+    let tags;
     if (data.tags.data.length > 0) {
-        data.tags.data.forEach(tag => {
-            tags.push(tag.name)
-        })
-        tags.join(', ')
+        tags = data.tags.data.map(tag => tag.name).join(', ')
     }
-    data.messages.data.forEach(message => {
-        lines.push({
+
+    return data.messages.data.map(message => {
+        return {
             id: data.id,
             status: data.status,
             created_at: moment(data.created_at).format('L'),
             updated_at: moment(data.updated_at).format('L'),
-            order_number: data.order_seller ? data.order_seller.data.reference : '',
-            from: message.user.data.roles.data[0].type,
+            order_number: data.order_seller?.data.reference,
+            from: message.user.data.roles.data[0]?.type,
             subject: data.subject,
             message: message.body,
             message_created_at: moment(message.created_at).format('L'),
-            seller: data.seller ? data.seller.data.name : '',
-            tags
-        })
+            seller: data.seller?.data.name,
+            tags: tags ?? ''
+        }
     })
-    return lines
 }
 
 const headers = [
@@ -49,6 +46,7 @@ const uri = '/v1/tickets?include=messages.user.roles,seller,order_seller,tags'
 
 module.exports = {
     uri,
+    page_size: 200,
     models: [
         {
             detail,

@@ -13,15 +13,19 @@ const detail = async product => {
         variants.forEach(variant => {
 
             // get deepest category level's name
-            let categories_name, categories_id, default_category
+            // let categories_name, categories_id, default_category
+            let has_finest_category = false;
             if (product.categories.data.length > 0) {
                 const categories_level_5 = product.categories.data.filter(category => category.level_depth === 5)
-                categories_name = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
-                categories_id = categories_level_5.map(category => category.id).join(' / ')
+                if (categories_level_5.length > 0) {
+                    has_finest_category = true;
+                }
+                // categories_name = categories_level_5.map(category => category.translations.data[0].name).join(' / ')
+                // categories_id = categories_level_5.map(category => category.id).join(' / ')
             }
-            if (product.default_category_id) {
-                default_category = product.categories.data.find(cat => cat.id === product.default_category_id).translations.data[0].name
-            }
+            // if (product.default_category_id) {
+            //     default_category = product.categories.data.find(cat => cat.id === product.default_category_id).translations.data[0].name
+            // }
 
             const Product = {
                 id: product.id,
@@ -34,12 +38,11 @@ const detail = async product => {
                 name: product.translations.data[0].name,
                 long_description: product.translations.data[0].description,
                 short_description: product.translations.data[0].description_short,
-                default_category,
-                categories_name,
-                categories_id,
-                reviews_amount: product.product_reviews.data.length,
+                default_category: product.default_category_id,
+                has_finest_category,
                 url: product.url_front,
                 state: product.state,
+                on_sale: product.additional_information.on_sale.value === "1"  ? 'Oui' : "Non",
                 meta_title: product.translations.data[0].meta_title,
                 meta_description: product.translations.data[0].meta_description
             }
@@ -71,8 +74,7 @@ const detail = async product => {
         return products
 
     } catch (error) {
-        console.log(error)
-        console.log(error.code)
+        console.log(error?.code)
     }
 };
 
@@ -88,11 +90,10 @@ const headers = [
     { id: 'long_description', title: 'Description longue' },
     { id: 'short_description', title: 'Description courte' },
     { id: 'default_category', title: 'Categorie principale' },
-    { id: 'categories_name', title: 'Categories' },
-    { id: 'categories_id', title: 'ID categories' },
-    { id: 'reviews_amount', title: 'Nombre avis' },
+    { id: 'has_finest_category', title: 'Categorie niveau 5' },
     { id: 'url', title: 'Lien' },
     { id: 'state', title: 'Statut' },
+    { id: 'on_sale', title: 'En soldes' },
     { id: 'meta_title', title: 'Meta title' },
     { id: 'meta_description', title: 'Meta description' },
     { id: 'attribute_value_id', title: 'ID valeur attribut' }
@@ -100,7 +101,7 @@ const headers = [
 
 const filename = 'products.csv'
 
-const uri = '/v1/catalog/products?include=categories,features.feature_type,product_reviews'
+const uri = '/v1/catalog/products?include=features.feature_type,categories'
 
 
 //products categories
@@ -140,6 +141,7 @@ const balls = {
 
 module.exports = {
     uri,
+    page_size: 100,
     models: [
         {
             detail,
